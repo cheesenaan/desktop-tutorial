@@ -1,13 +1,9 @@
-CREATE TABLE education (
-    education_id INTEGER NOT NULL,
-    university   VARCHAR2(255), 
-    major        VARCHAR2(255), 
-    gpa          FLOAT,
-    coursework   VARCHAR2(1000), 
-    location     VARCHAR2(255)
-);
+ion ADD CONSTRAINT education_pk PRIMARY KEY ( education_id );
 
-ALTER TABLE education ADD CONSTRAINT education_pk PRIMARY KEY ( education_id );
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBD3OqQo2yd+qZwF4OV2Pb8/aykRzF+jWzeOtU6b3nZL your_email@example.com
+
+
+
 
 CREATE TABLE project (
     project_id   INTEGER NOT NULL,
