@@ -159,6 +159,131 @@ To create the Sqitch plan based on the above scripts:
 
    ```sh
    sqitch deploy db:pg://username:password@hostname/dbname
+
+
+
+
+
+
+
+   The verify scripts are used in Sqitch to check that the deployed changes have been applied correctly. For each table, the verify script typically checks for the existence of the table and its expected structure. Here's how you can create the verify scripts for your tables and constraints:
+
+### 1. Verify `education` Table
+
+**verify/add_education_table.sql**
+```sql
+-- verify/add_education_table.sql
+
+BEGIN
+    -- Check if the education table exists
+    EXECUTE IMMEDIATE 'SELECT 1 FROM education WHERE ROWNUM = 1';
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Table education does not exist or is not accessible');
+END;
+/
+```
+
+### 2. Verify `project` Table
+
+**verify/add_project_table.sql**
+```sql
+-- verify/add_project_table.sql
+
+BEGIN
+    -- Check if the project table exists
+    EXECUTE IMMEDIATE 'SELECT 1 FROM project WHERE ROWNUM = 1';
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Table project does not exist or is not accessible');
+END;
+/
+```
+
+### 3. Verify `user_data` Table
+
+**verify/add_user_data_table.sql**
+```sql
+-- verify/add_user_data_table.sql
+
+BEGIN
+    -- Check if the user_data table exists
+    EXECUTE IMMEDIATE 'SELECT 1 FROM user_data WHERE ROWNUM = 1';
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Table user_data does not exist or is not accessible');
+END;
+/
+```
+
+### 4. Verify `work_experience` Table
+
+**verify/add_work_experience_table.sql**
+```sql
+-- verify/add_work_experience_table.sql
+
+BEGIN
+    -- Check if the work_experience table exists
+    EXECUTE IMMEDIATE 'SELECT 1 FROM work_experience WHERE ROWNUM = 1';
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Table work_experience does not exist or is not accessible');
+END;
+/
+```
+
+### 5. Verify Foreign Key Constraints
+
+**verify/add_foreign_keys.sql**
+```sql
+-- verify/add_foreign_keys.sql
+
+BEGIN
+    -- Check if the foreign key constraints exist
+    EXECUTE IMMEDIATE '
+        SELECT 1
+        FROM all_constraints
+        WHERE constraint_name = ''EDUCATION_USER_DATA_FK'' AND table_name = ''EDUCATION''';
+    
+    EXECUTE IMMEDIATE '
+        SELECT 1
+        FROM all_constraints
+        WHERE constraint_name = ''PROJECT_USER_DATA_FK'' AND table_name = ''PROJECT''';
+    
+    EXECUTE IMMEDIATE '
+        SELECT 1
+        FROM all_constraints
+        WHERE constraint_name = ''WORK_EXPERIENCE_USER_DATA_FK'' AND table_name = ''WORK_EXPERIENCE''';
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20000, 'One or more foreign key constraints do not exist');
+END;
+/
+```
+
+### Creating Verify Scripts in Sqitch
+
+1. Add the verify scripts to your Sqitch project:
+
+   ```sh
+   sqitch add add_education_table -n "Add education table" --verify
+   sqitch add add_project_table -n "Add project table" --verify
+   sqitch add add_user_data_table -n "Add user_data table" --verify
+   sqitch add add_work_experience_table -n "Add work_experience table" --verify
+   sqitch add add_foreign_keys -n "Add foreign key constraints" --verify
+   ```
+
+2. Write the verify scripts (`verify/*.sql`) as shown above for each change.
+
+3. Verify the deployed changes in your database:
+
+   ```sh
+   sqitch verify db:pg://username:password@hostname/dbname
+   ```
+
+Replace `username`, `password`, `hostname`, and `dbname` with your database credentials and details.
+
+These verify scripts will ensure that each table and constraint has been correctly applied to your database, providing an additional layer of validation for your schema changes. Adjust the SQL syntax as per your specific database engine requirements if you're not using Oracle.
    ```
 
 Replace `username`, `password`, `hostname`, and `dbname` with your database credentials and details.
