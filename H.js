@@ -1,32 +1,35 @@
-pipeline {
-    agent any
+stages:
+  - deploy
+  - verify
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git url: 'https://gitlab.com/your-repo.git', branch: 'main'
-            }
-        }
+variables:
+  GIT_STRATEGY: fetch # Ensures that the repository is fetched before each job
 
-        stage('Deploy') {
-            steps {
-                sh 'sh deploy.txt'
-            }
-        }
+before_script:
+  - git checkout sulemaan-test # Checkout the correct branch
 
-        stage('Verify') {
-            steps {
-                sh 'sh verify.txt'
-            }
-        }
-    }
+deploy:
+  stage: deploy
+  script:
+    - sh deploy.txt
+  only:
+    - sulemaan-test
 
-    post {
-        success {
-            echo 'Deployment and verification successful.'
-        }
-        failure {
-            echo 'Deployment or verification failed.'
-        }
-    }
-}
+verify:
+  stage: verify
+  script:
+    - sh verify.txt
+  only:
+    - sulemaan-test
+
+after_script:
+  - echo 'Deployment and verification successful.'
+
+# Handle failure scenarios
+failure:
+  stage: .post
+  script:
+    - echo 'Deployment or verification failed.'
+  when: on_failure
+  only:
+    - sulemaan-test
