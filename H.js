@@ -1,60 +1,46 @@
-Here's a step-by-step guide to create a SAM template that points to your `index.js` handler and sets up an API Gateway event:
-
-1. **Create a SAM Template**:
-
-Create a `template.yaml` file in the root directory (`resume-backend`) with the following content:
-
-```yaml
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
-Resources:
-  HelloWorldFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties: 
-      Handler: functions/resume/index.handler
-      Runtime: nodejs14.x
-      CodeUri: .
-      Events:
-        HelloWorldApi:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
-Outputs:
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
-```
-
-2. **Create the Lambda Handler**:
-
-Ensure your `functions/resume/index.js` file has the following content:
-
-```javascript
 exports.handler = async (event) => {
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Hello World</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    background-color: #f0f0f0;
+                }
+                .container {
+                    text-align: center;
+                    background: #ffffff;
+                    padding: 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+                h1 {
+                    color: #333;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Hello World!</h1>
+            </div>
+        </body>
+        </html>
+    `;
+
     return {
         statusCode: 200,
-        body: JSON.stringify({ message: "hello world!" }),
+        headers: {
+            'Content-Type': 'text/html',
+        },
+        body: htmlContent,
     };
 };
-```
-
-3. **Start the SAM Local API Gateway**:
-
-Open a terminal and navigate to the `resume-backend` directory. Run the following command to start the SAM local API Gateway:
-
-```bash
-sam local start-api
-```
-
-4. **Test the API with Postman**:
-
-Open Postman and create a new GET request to the following URL:
-
-```
-http://localhost:3000/hello
-```
-
-Send the request. You should receive a response with a JSON object containing the message "hello world!".
-
-By following these steps, you should have a fully functional SAM template pointing to your `index.js` handler with an API Gateway event that triggers the function at the `/hello` endpoint.
