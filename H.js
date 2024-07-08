@@ -3,7 +3,7 @@ const knex = require('knex');
 
 class ResumeDataDAO {
   constructor() {
-      this.db = knex ({
+      this.db = knex({
           client: 'pg',
           connection: {
             host: process.env.POSTGRES_HOST,
@@ -19,22 +19,25 @@ class ResumeDataDAO {
   async getAllUserData() {
       try {
         const user_data = await this.db.raw('select * from user_data');
-        // console.log("log:", user_data)
-        return user_data;
+        return user_data.rows; // Assuming 'user_data' is an object with a 'rows' property containing the fetched data
       } catch (error) {
-        console.error("erro fetching users:" , error.message);
+        console.error("Error fetching users:", error.message);
         throw error;
       }
   }
 }
 
-module.exports = ResumeDataDAO;
+async function fetchDataAndLog() {
+  const resumeDataDAO = new ResumeDataDAO();
+  try {
+    const data = await resumeDataDAO.getAllUserData();
+    console.log("Fetched data:", data);
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+  } finally {
+    // Optionally, you can destroy the database connection here if needed:
+    // await resumeDataDAO.destroy();
+  }
+}
 
-
-const resumeDataDAO = new ResumeDataDAO();
-const data = resumeDataDAO.getAllUserData();
-console.log("from object:", data);
-
-[sulefa8@10-119-227-72 resume]$ node ResumeDataDAO.js 
-ResumeDataDAO init
-from object: Promise { <pending> }
+fetchDataAndLog();
