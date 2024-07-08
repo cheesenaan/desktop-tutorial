@@ -53,7 +53,8 @@ class ResumeDataDAO {
             host: process.env.POSTGRES_HOST,
             user: process.env.POSTGRES_USERNAME,
             password: process.env.POSTGRES_PASSWORD,
-            database: process.env.POSTGRES_DATABASE
+            database: process.env.POSTGRES_DATABASE,
+            port : process.env.POSTGRES_PORT
           }
       });
 
@@ -71,21 +72,7 @@ class ResumeDataDAO {
   }
 }
 
-async function fetchDataAndLog() {
-  const resumeDataDAO = new ResumeDataDAO();
-  try {
-    const data = await resumeDataDAO.getAllUserData();
-    console.log("Fetched data:", data);
-  } catch (error) {
-    console.error("Failed to fetch data:", error);
-  } finally {
-    // Optionally, you can destroy the database connection here if needed:
-    // await resumeDataDAO.destroy();
-  }
-}
 
-fetchDataAndLog();
+module.exports = ResumeDataDAO;
 
-when running /resume on postman i get error : {
-    "error": "ResumeDataDAO is not a constructor"
-}
+
