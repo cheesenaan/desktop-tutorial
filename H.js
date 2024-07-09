@@ -1,33 +1,60 @@
-import logo from './logo.svg';
-import './App.css';
-
-import React, { Fragment, Component } from 'react';
-import { VDSManager } from '@vds/utilities';
-import { Title } from '@vds/typography';
-
 export default class App extends Component {
   render() {
     return (
       <Fragment>
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <p>
-              Edit <code>src/App.js</code> and save to reload.
-            </p>
-            <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn React
-            </a>
-          </header>
-          <VDSManager />
-          <Title>Viewport Manager</Title>
-        </div>
+        <VDSManager/>
+
+
+      
+
+        <TileContainer
+          padding='12px'
+          aspectRatio='16:9'
+          width='100%'
+          height='725px'
+          backgroundColor="black"
+          >
+            
+            <TitleLockup
+              surface="dark"
+              textAlignment='center'
+              data={{
+                eyebrow: {
+                  size: 'titleMedium',
+                  children: 'Get Started ... Learn More ...  About me ...  Support',
+                  bold: 'true',
+                },
+                title: {
+                  size: 'title2XLarge',
+                  children: 'Resume 2x the speed.',
+                },
+                subtitle: {
+                  size: 'titleSmall',
+                  children: 'Unlock your career potential.',
+                  
+                },
+              }}
+            />
+
+        </TileContainer>;
+
+
+        <ModalFooter
+          buttonData={{
+            primary: {
+              children: 'Get Started',
+              onClick: () => alert('Clicked Get Started'),
+            },
+            close: {
+              children: 'Learn More',
+              onClick: () => alert('Clicked Learn More'),
+            },
+          }}
+        />
+
+
       </Fragment>
+      
     );
   }
 }
