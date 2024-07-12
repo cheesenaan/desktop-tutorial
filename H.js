@@ -1,30 +1,4 @@
-import React, { Component } from 'react';
-
-export default class App extends Component {
-  render() {
-    const handleBuildResumeClick = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/resume?user_id=1', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        alert('Resume built successfully!');
-        console.log(data);
-      } catch (error) {
-        console.error('Error fetching resume:', error);
-        alert('Error building resume');
-      }
-    };
-
-    return (
+react apps.js
       <div style={resumeSubmitButton}>
         <br /><br /><br /><br /><br />
         <ButtonGroup
@@ -51,6 +25,23 @@ export default class App extends Component {
         />
         <br /><br /><br /><br /><br />
       </div>
-    );
-  }
-}
+
+
+node js backend index.js file api
+api.get('/resume', async (req, res) => {
+    try {
+        const { user_id } = req.query; // Get user_id from query parameters
+        if (!user_id) {
+            return res.status(400).json({ error: 'user_id is required' });
+        }
+
+        const resumeDataDAO = new ResumeDataDAO();
+        const data = await resumeDataDAO.getResumeData(user_id);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+when Build resume is clicked , i want to get the resume data using the /resume api with user_id = 1 
