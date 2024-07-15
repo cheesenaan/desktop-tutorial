@@ -91,4 +91,18 @@ class ResumeDataDAO {
     }
 }
 
-module.exports = ResumeDataDAO;
+module.exports = Re
+
+
+
+async sendUserData(req, res) {
+    try {
+        const query = 'INSERT INTO user_data (user_id, first_name, last_name, phone, email, location, languages) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const values = [3, 'sulemaan-test', 'farooq-test', '9174565697', 'test@gmail.com', 'Alabama', 'english, spanish'];
+        await this.db.raw(query, values);
+        res.status(200).send('Data saved successfully');
+    } catch (err) {
+        console.error('Failed to save data:', err.message);
+        res.status(500).send('Failed to save data, error from Node.js DAO');
+    }
+}
