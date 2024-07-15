@@ -1,528 +1,165 @@
-<div id='resume-build' style = {resumeBuild}>
+To save the form data from your React app to a PostgreSQL database using your Node.js backend, follow these steps:
 
-            <br />  <br />  <br />  <br />  <br />
-              <TitleLockup
-                surface="light"
-                textAlignment='center'
-                data={{
-                  
-                  title: {
-                    size: 'title2XLarge',
-                    children: 'Resume Build.',
-                  },
-                }}
-                />
+1. **Update React App to Send Form Data to Backend:**
+   - Capture form data and send it to the backend using a POST request.
 
-              <br />  <br />  <br />  <br />  <br />
-              
-              <form> 
-              <div id='form' style = {formStyle}>
+2. **Set Up Node.js Backend to Handle the Request:**
+   - Create an endpoint to receive the form data.
+   - Connect to the PostgreSQL database and insert the data into the `user_data` table.
 
+3. **Connect Node.js to PostgreSQL:**
+   - Use a library like `pg` to interact with PostgreSQL.
 
-      {/* <TextArea 
-        label="Street Address"
-        readOnly={false}
-        required={false}
-        disabled={false}
-        error={false}
-        errorText='Enter a valid address.'
-        helperText='For example: 123 Verizon St'
-        tooltipTitle='Check the formatting of your address'
-        tooltipContent="House/Building number then street name"
-        maxLength={200} /> */}
+Here's a step-by-step guide:
 
-        <Input 
-        type="text" 
-        label="First name"
-        name='first_name'
-        width="50%"
-        readOnly={false}
-        required={true}
-        disabled={false}
-        error={false}
-        errorText='Enter a valid name.'
-        /> <br /> <br /> 
+### React: Capture and Send Form Data
 
-      <Input 
-        type="text" 
-        width="50%"
-        label="Last name"
-        readOnly={false}
-        required={true}
-        disabled={false}
-        error={false}
-        errorText='Enter a valid name.'
-        /> <br /> <br />
+First, update your React component to capture form data and send it to your backend:
 
-      <Input 
-        type="tel" 
-        width="50%"
-        label="Phone number"
-        readOnly={false}
-        required={true}
-        disabled={false}
-        error={false}
-        errorText='Enter a valid phone number.'
-        defaultValue={'1234567890'}
-      /> <br /> <br /> 
+```jsx
+import React, { Component } from 'react';
 
-        <Input 
-        type="email" 
-        label="Email"
-        width="50%"
-        readOnly={false}
-        required={true}
-        disabled={false}
-        error={false}
-        errorText='Enter a valid email.'
-        /> <br /> <br /> 
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      streetAddress: '',
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      // Add other form fields as needed
+    };
+  }
 
-        <DropdownSelect 
-        label="Location"
-        width="50%"
-        errorText='Select a state'
-        error={false}
-        disabled={false}
-        readOnly={false}
-        inlineLabel={false}
-        >
-            <option></option>
-            <option>Alabama</option>
-            <option>Alaska</option>
-            <option>Arizona</option>
-            <option>Arkansas</option>
-            <option>California</option>
-            <option>Colorado</option>
-            <option>Connecticut</option>
-            <option>Delaware</option>
-            <option>District Of Columbia</option>
-            <option>Florida</option>
-            <option>Georgia</option>
-            <option>Hawaii</option>
-            <option>Idaho</option>
-            <option>Illinois</option>
-            <option>Indiana</option>
-            <option>Iowa</option>
-            <option>Kansas</option>
-            <option>Kentucky</option>
-            <option>Louisiana</option>
-            <option>Maine</option>
-            <option>Maryland</option>
-            <option>Massachusetts</option>
-            <option>Michigan</option>
-            <option>Minnesota</option>
-            <option>Mississippi</option>
-            <option>Missouri</option>
-            <option>Montana</option>
-            <option>Nebraska</option>
-            <option>Nevada</option>
-            <option>New Hampshire</option>
-            <option>New Jersey</option>
-            <option>New Mexico</option>
-            <option>New York</option>
-            <option>North Carolina</option>
-            <option>North Dakota</option>
-            <option>Ohio</option>
-            <option>Oklahoma</option>
-            <option>Oregon</option>
-            <option>Pennsylvania</option>
-            <option>Rhode Island</option>
-            <option>South Carolina</option>
-            <option>South Dakota</option>
-            <option>Tennessee</option>
-            <option>Texas</option>
-            <option>Utah</option>
-            <option>Vermont</option>
-            <option>Virginia</option>
-            <option>Washington</option>
-            <option>West Virginia</option>
-            <option>Wisconsin</option>
-            <option>Wyoming</option>
-        </DropdownSelect> <br /> <br /> 
+  handleChange = (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
 
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const { streetAddress, firstName, lastName, phoneNumber } = this.state;
 
-      <Input 
-        type="text" 
-        width="50%"
-        label="Languages"
-        readOnly={false}
-        required={true}
-        disabled={false}
-        error={false}
-        errorText='Enter a valid name.'
-        /> <br /> <br />
+    const response = await fetch('/api/saveUserData', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ streetAddress, firstName, lastName, phoneNumber }),
+    });
 
-        <Input 
-          type="text" 
+    if (response.ok) {
+      alert('Data saved successfully!');
+    } else {
+      alert('Failed to save data.');
+    }
+  };
+
+  render() {
+    return (
+      <form id="form" style={{ form: {} }} onSubmit={this.handleSubmit}>
+        <TextArea
+          label="Street Address"
+          name="streetAddress"
+          value={this.state.streetAddress}
+          onChange={this.handleChange}
+          required
+          // Other props
+        />
+        <Input
+          type="text"
           width="50%"
-          label="University"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid University.'
-        /> <br /> <br /> 
-
-        <Input 
-          type="text" 
+          label="First name"
+          name="firstName"
+          value={this.state.firstName}
+          onChange={this.handleChange}
+          required
+          // Other props
+        />
+        <Input
+          type="text"
           width="50%"
-          label="University location"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter valid university location.'
-        /> <br /> <br /> 
-
-        <Input 
-          type="text" 
+          label="Last name"
+          name="lastName"
+          value={this.state.lastName}
+          onChange={this.handleChange}
+          required
+          // Other props
+        />
+        <Input
+          type="tel"
           width="50%"
-          label="Major"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid major.'
-        /> <br /> <br /> 
+          label="Phone number"
+          name="phoneNumber"
+          value={this.state.phoneNumber}
+          onChange={this.handleChange}
+          required
+          // Other props
+        />
+        <button type="submit">Submit</button>
+      </form>
+    );
+  }
+}
+```
 
-        <Input 
-          type="text" 
-          width="50%"
-          label="GPA"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid GPA.'
-        /> <br /> <br /> 
+### Node.js: Set Up Endpoint to Receive Form Data
 
-      <Input 
-          type="text" 
-          width="50%"
-          label="coursework"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter valid coursework.'
-        /> <br /> <br /> 
+Next, create an endpoint in your Node.js backend to handle the form submission:
 
-      <RadioButtonGroup
-          onChange={() => {}}
-          error={false}
-          data={[
-            {
-              name: 'group',
-              label: 'I have work experience',
-              children: 'You will be prompted to enter a maximum of 3 work experiences',
-              value: 'radioOne',
-              ariaLabel: 'radio one',
-              disabled: false
-            },
-            {
-              name: 'group',
-              label: 'I do not have work experience',
-              children: 'You will not be asked to enter any work experiences',
-              value: 'radioTwo',
-              ariaLabel: 'radio two',
-            }
-          ]}
-        /> <br /> <br /> 
+```javascript
+const express = require('express');
+const bodyParser = require('body-parser');
+const { Pool } = require('pg');
+const app = express();
 
+app.use(bodyParser.json());
 
-        <Input 
-          type="text" 
-          width="50%"
-          label="Company 1"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
+const pool = new Pool({
+  user: 'your_db_user',
+  host: 'localhost',
+  database: 'your_db_name',
+  password: 'your_db_password',
+  port: 5432,
+});
 
+app.post('/api/saveUserData', async (req, res) => {
+  const { streetAddress, firstName, lastName, phoneNumber } = req.body;
+  
+  try {
+    const query = 'INSERT INTO user_data (street_address, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4)';
+    const values = [streetAddress, firstName, lastName, phoneNumber];
+    await pool.query(query, values);
+    res.status(200).send('Data saved successfully');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to save data');
+  }
+});
 
-        <Input 
-          type="text" 
-          width="50%"
-          label="Job Title 1"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
 
-      <DatePicker
-        dateFormat="MM/DD/YYYY"
-        width="70.75%"
-        alwaysOpen={false}
-        readOnly={false}
-        disabled={false}
-        surface="light"
-        minDate={new Date(1998, 1, 1)}
-        label="Start Date 1"
-        helperText="Choose the correct date for your appointment"
-        helperTextPlacement="bottom"
-      /> <br /> <br /> 
+### PostgreSQL: `user_data` Table Schema
 
-      <DatePicker
-        dateFormat="MM/DD/YYYY"
-        width="70.75%"
-        alwaysOpen={false}
-        readOnly={false}
-        disabled={false}
-        surface="light"
-        minDate={new Date(1998, 1, 1)}
-        label="End Date 1"
-        helperText="Choose the correct date for your appointment"
-        helperTextPlacement="bottom"
-      /> <br /> <br /> 
+Ensure your PostgreSQL `user_data` table has the appropriate columns:
 
-        <Input 
-          type="text" 
-          width="50%"
-          label="Description 1"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
+```sql
+CREATE TABLE user_data (
+  id SERIAL PRIMARY KEY,
+  street_address VARCHAR(255),
+  first_name VARCHAR(50),
+  last_name VARCHAR(50),
+  phone_number VARCHAR(15)
+);
+```
 
-      <Input 
-          type="text" 
-          width="50%"
-          label="Company 2"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
+### Summary
 
+1. **React:** Capture form data and send it to the backend.
+2. **Node.js:** Set up an endpoint to receive data and insert it into PostgreSQL.
+3. **PostgreSQL:** Ensure your table schema matches the data you want to store.
 
-        <Input 
-          type="text" 
-          width="50%"
-          label="Job Title 2"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-        <Input 
-          type="date" 
-          label="Start Date 2"
-          width="50%"
-          readOnly={false}
-          required={false}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid date.'
-          helperText='For example: 123 Verizon St'
-          helperTextPlacement="bottom"
-          tooltipTitle='Check the formatting of your address'
-          tooltipContent="House/Building number then street name" /> <br /> <br /> 
-
-        <Input 
-          type="date" 
-          label="End Date 2"
-          width="50%"
-          readOnly={false}
-          required={false}
-          disabled={false}
-          error={false}/> <br /> <br /> 
-
-        <Input 
-          type="text" 
-          width="50%"
-          label="Description 2"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-      <Input 
-          type="text" 
-          width="50%"
-          label="Company 3"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-
-        <Input 
-          type="text" 
-          width="50%"
-          label="Job Title 3"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-        <Input 
-          type="date" 
-          label="Start Date 3"
-          width="50%"
-          readOnly={false}
-          required={false}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid date.'
-          helperText='For example: 123 Verizon St'
-          helperTextPlacement="bottom"
-          tooltipTitle='Check the formatting of your address'
-          tooltipContent="House/Building number then street name" /> <br /> <br /> 
-
-        <Input 
-          type="date" 
-          label="End Date 3"
-          width="50%"
-          readOnly={false}
-          required={false}
-          disabled={false}
-          error={false}/> <br /> <br /> 
-
-        <Input 
-          type="text" 
-          width="50%"
-          label="Description 3"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-      <RadioButtonGroup
-          onChange={() => {}}
-          error={false}
-          data={[
-            {
-              name: 'group',
-              label: 'I have project experience',
-              children: 'You will be prompted to enter a maximum of 3 project experiences',
-              value: 'radioOne',
-              ariaLabel: 'radio one',
-              disabled: false
-            },
-            {
-              name: 'group',
-              label: 'I do not have project experience',
-              children: 'You will not be asked to enter any project experiences',
-              value: 'radioTwo',
-              ariaLabel: 'radio two',
-            }
-          ]}
-        /> <br /> <br /> 
-
-      <Input 
-          type="text" 
-          width="50%"
-          label="Project title 1"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-      <Input 
-          type="text" 
-          width="50%"
-          label="Project description 1"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-    <Input 
-          type="text" 
-          width="50%"
-          label="Project title 2"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-      <Input 
-          type="text" 
-          width="50%"
-          label="Project description 2"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-    <Input 
-          type="text" 
-          width="50%"
-          label="Project title 3"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-      <Input 
-          type="text" 
-          width="50%"
-          label="Project description 3"
-          readOnly={false}
-          required={true}
-          disabled={false}
-          error={false}
-          errorText='Enter a valid name.'
-        /> <br /> <br />
-
-
-            <div style={resumeSubmitButton}> 
-                <br /><br /><br /><br /><br />
-                <ButtonGroup
-                  childwidth="100%"
-                  viewport="desktop"
-                  rowQuantity={{ desktop: 2 }}
-                  data={[
-                    {
-                      children: 'Build resume',
-                      size: 'large',
-                      use: 'primary',
-                      width: 'auto',
-                      onClick: this.handleBuildResumeClick
-                    },
-                    {
-                      children: 'Cancel',
-                      size: 'large',
-                      use: 'textLink',
-                      width: 'auto'
-                    }
-                  ]}
-                  alignment="center"
-                />
-                <br /><br /><br /><br /><br />
-            </div>
-
-              </div>
-              </form>
-        </div>
-
-
-this is from react apps.js file
-i want to pass this data to node js and then create api to save the data in psql DB
+With this setup, when the user submits the form, the data will be sent to your backend, which will then save it to your PostgreSQL database.
