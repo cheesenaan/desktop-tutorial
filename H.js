@@ -1,12 +1,5 @@
-{
+ERROR:  Failing row contains (null, sulemaan-test, farooq-test, 9174565697, test@gmail.com, Alabama, english, spanish).null value in column "user_id" of relation "user_data" violates not-null constraint 
 
-    "first_name" : "sulemaan-test",
-    "last_name" : "farooq-test",
-    "phone" : "9174565697",
-    "email" : "test@gmail.com",
-    "location" : "Alabama",
-    "languages" : "english, spanish"
-}
-
-INSERT INTO user_data (first_name, last_name, phone, email, location, languages) 
-VALUES ('sulemaan-test', 'farooq-test', '9174565697', 'test@gmail.com', 'Alabama', 'english, spanish');
+ERROR:  null value in column "user_id" of relation "user_data" violates not-null constraint
+SQL state: 23502
+Detail: Failing row contains (null, sulemaan-test, farooq-test, 9174565697, test@gmail.com, Alabama, english, spanish).
