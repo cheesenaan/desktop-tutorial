@@ -1,33 +1,15 @@
-To save the form data from your React app to a PostgreSQL database using your Node.js backend, follow these steps:
-
-1. **Update React App to Send Form Data to Backend:**
-   - Capture form data and send it to the backend using a POST request.
-
-2. **Set Up Node.js Backend to Handle the Request:**
-   - Create an endpoint to receive the form data.
-   - Connect to the PostgreSQL database and insert the data into the `user_data` table.
-
-3. **Connect Node.js to PostgreSQL:**
-   - Use a library like `pg` to interact with PostgreSQL.
-
-Here's a step-by-step guide:
-
-### React: Capture and Send Form Data
-
-First, update your React component to capture form data and send it to your backend:
-
-```jsx
-import React, { Component } from 'react';
-
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      streetAddress: '',
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      // Add other form fields as needed
+      resumeData: null,
+      error: null,
+      first_name: '',
+      last_name: '',
+      phone: '',
+      email: '',
+      location: '',
+      languages: '',
     };
   }
 
@@ -38,128 +20,168 @@ export default class App extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { streetAddress, firstName, lastName, phoneNumber } = this.state;
+    const { first_name, last_name, phone, email, location, languages } = this.state;
 
     const response = await fetch('/api/saveUserData', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ streetAddress, firstName, lastName, phoneNumber }),
+      body: JSON.stringify({ first_name, last_name, phone, email, location, languages }),
     });
 
     if (response.ok) {
       alert('Data saved successfully!');
     } else {
-      alert('Failed to save data.');
+      alert('Failed to save data error from react apps.js file.');
     }
   };
 
-  render() {
-    return (
-      <form id="form" style={{ form: {} }} onSubmit={this.handleSubmit}>
-        <TextArea
-          label="Street Address"
-          name="streetAddress"
-          value={this.state.streetAddress}
-          onChange={this.handleChange}
-          required
-          // Other props
-        />
-        <Input
-          type="text"
-          width="50%"
-          label="First name"
-          name="firstName"
-          value={this.state.firstName}
-          onChange={this.handleChange}
-          required
-          // Other props
-        />
-        <Input
-          type="text"
-          width="50%"
-          label="Last name"
-          name="lastName"
-          value={this.state.lastName}
-          onChange={this.handleChange}
-          required
-          // Other props
-        />
-        <Input
-          type="tel"
-          width="50%"
-          label="Phone number"
-          name="phoneNumber"
-          value={this.state.phoneNumber}
-          onChange={this.handleChange}
-          required
-          // Other props
-        />
-        <button type="submit">Submit</button>
-      </form>
-    );
-  }
-}
-```
 
-### Node.js: Set Up Endpoint to Receive Form Data
+...
 
-Next, create an endpoint in your Node.js backend to handle the form submission:
 
-```javascript
-const express = require('express');
-const bodyParser = require('body-parser');
-const { Pool } = require('pg');
-const app = express();
+<form id="form" style={{ form: {} }} onSubmit={this.handleSubmit}>
+              <div id='form' style = {formStyle}>
 
-app.use(bodyParser.json());
+    <Input 
+        type="text" 
+        label="First name"
+        name='first_name'
+        value={this.state.first_name}
+        onChange={this.handleChange}
+        width="50%"
+        readOnly={false}
+        required={true}
+        disabled={false}
+        error={false}
+        errorText='Enter a valid name.'
+        /> <br /> <br /> 
 
-const pool = new Pool({
-  user: 'your_db_user',
-  host: 'localhost',
-  database: 'your_db_name',
-  password: 'your_db_password',
-  port: 5432,
-});
+      <Input 
+        type="text" 
+        width="50%"
+        label="Last name"
+        name='last_name'
+        value={this.state.last_name}
+        onChange={this.handleChange}
+        readOnly={false}
+        required={true}
+        disabled={false}
+        error={false}
+        errorText='Enter a valid name.'
+        /> <br /> <br />
 
-app.post('/api/saveUserData', async (req, res) => {
-  const { streetAddress, firstName, lastName, phoneNumber } = req.body;
-  
-  try {
-    const query = 'INSERT INTO user_data (street_address, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4)';
-    const values = [streetAddress, firstName, lastName, phoneNumber];
-    await pool.query(query, values);
-    res.status(200).send('Data saved successfully');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Failed to save data');
-  }
-});
+       <Input 
+        type="tel" 
+        width="50%"
+        label="Phone number"
+        name='phone'
+        value={this.state.phone}
+        onChange={this.handleChange}
+        readOnly={false}
+        required={true}
+        disabled={false}
+        error={false}
+        errorText='Enter a valid phone number.'
+        defaultValue={'1234567890'}
+      /> <br /> <br /> 
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
-```
+        <Input 
+        type="email" 
+        label="Email"
+        name='email'
+        width="50%"
+        value={this.state.email}
+        onChange={this.handleChange}
+        readOnly={false}
+        required={true}
+        disabled={false}
+        error={false}
+        errorText='Enter a valid email.'
+        /> <br /> <br /> 
 
-### PostgreSQL: `user_data` Table Schema
+        <DropdownSelect 
+        label="Location"
+        width="50%"
+        errorText='Select a state'
+        error={false}
+        disabled={false}
+        readOnly={false}
+        inlineLabel={false}
+        >
+            <option></option>
+            <option>Alabama</option>
+            <option>Alaska</option>
+            <option>Arizona</option>
+            <option>Arkansas</option>
+            <option>California</option>
+            <option>Colorado</option>
+            <option>Connecticut</option>
+            <option>Delaware</option>
+            <option>District Of Columbia</option>
+            <option>Florida</option>
+            <option>Georgia</option>
+            <option>Hawaii</option>
+            <option>Idaho</option>
+            <option>Illinois</option>
+            <option>Indiana</option>
+            <option>Iowa</option>
+            <option>Kansas</option>
+            <option>Kentucky</option>
+            <option>Louisiana</option>
+            <option>Maine</option>
+            <option>Maryland</option>
+            <option>Massachusetts</option>
+            <option>Michigan</option>
+            <option>Minnesota</option>
+            <option>Mississippi</option>
+            <option>Missouri</option>
+            <option>Montana</option>
+            <option>Nebraska</option>
+            <option>Nevada</option>
+            <option>New Hampshire</option>
+            <option>New Jersey</option>
+            <option>New Mexico</option>
+            <option>New York</option>
+            <option>North Carolina</option>
+            <option>North Dakota</option>
+            <option>Ohio</option>
+            <option>Oklahoma</option>
+            <option>Oregon</option>
+            <option>Pennsylvania</option>
+            <option>Rhode Island</option>
+            <option>South Carolina</option>
+            <option>South Dakota</option>
+            <option>Tennessee</option>
+            <option>Texas</option>
+            <option>Utah</option>
+            <option>Vermont</option>
+            <option>Virginia</option>
+            <option>Washington</option>
+            <option>West Virginia</option>
+            <option>Wisconsin</option>
+            <option>Wyoming</option>
+        </DropdownSelect> <br /> <br /> 
 
-Ensure your PostgreSQL `user_data` table has the appropriate columns:
 
-```sql
-CREATE TABLE user_data (
-  id SERIAL PRIMARY KEY,
-  street_address VARCHAR(255),
-  first_name VARCHAR(50),
-  last_name VARCHAR(50),
-  phone_number VARCHAR(15)
-);
-```
+      <Input 
+        type="text" 
+        width="50%"
+        label="Languages"
+        name='languages'
+        value={this.state.languages}
+        onChange={this.handleChange}
+        readOnly={false}
+        required={true}
+        disabled={false}
+        error={false}
+        errorText='Enter a valid name.'
+        /> <br /> <br />
 
-### Summary
+            <button type="submit">Submit</button>
 
-1. **React:** Capture form data and send it to the backend.
-2. **Node.js:** Set up an endpoint to receive data and insert it into PostgreSQL.
-3. **PostgreSQL:** Ensure your table schema matches the data you want to store.
+</div>
+              </form>
+        </div>
 
-With this setup, when the user submits the form, the data will be sent to your backend, which will then save it to your PostgreSQL database.
