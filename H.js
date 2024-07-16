@@ -1,104 +1,11 @@
-To integrate work experience and project data into your existing Node.js backend and React frontend setup, you'll need to extend your form handling, API endpoint, and database interaction accordingly. Here's how you can approach it:
+To modify your Node.js backend to send both a success message and the `userId` back to your React frontend, you can adjust the response format in your API endpoint. Here’s how you can do it:
 
-### 1. Update React Form Component (`apps.js`)
+### 1. Modify Backend (`index.js`)
 
-You have a form component where users can input their basic information (`first_name`, `last_name`, `phone`, `email`, `location`, `languages`, `university`, `university_location`, `major`, `gpa`, `coursework`). Now, you want to add fields for work experience and projects.
-
-Below is a simplified approach for handling work experience and projects. You may need to adjust it based on your exact requirements and UI components (`Input`, `DatePicker`, etc.):
-
-```jsx
-<Input 
-  type="text" 
-  width="50%"
-  label="Company 1"
-  name="company1"
-  value={this.state.company1}
-  onChange={this.handleChange}
-  required={true}
-/>
-<br /><br />
-<Input 
-  type="text" 
-  width="50%"
-  label="Job Title 1"
-  name="jobTitle1"
-  value={this.state.jobTitle1}
-  onChange={this.handleChange}
-  required={true}
-/>
-<br /><br />
-<DatePicker
-  dateFormat="MM/DD/YYYY"
-  width="70.75%"
-  label="Start Date 1"
-  name="startDate1"
-  selected={this.state.startDate1}
-  onChange={(date) => this.handleDateChange('startDate1', date)}
-/>
-<br /><br />
-<DatePicker
-  dateFormat="MM/DD/YYYY"
-  width="70.75%"
-  label="End Date 1"
-  name="endDate1"
-  selected={this.state.endDate1}
-  onChange={(date) => this.handleDateChange('endDate1', date)}
-/>
-<br /><br />
-<Input 
-  type="text" 
-  width="50%"
-  label="Description 1"
-  name="description1"
-  value={this.state.description1}
-  onChange={this.handleChange}
-  required={true}
-/>
-<br /><br />
-<Input 
-  type="text" 
-  width="50%"
-  label="Project Title 1"
-  name="projectTitle1"
-  value={this.state.projectTitle1}
-  onChange={this.handleChange}
-  required={true}
-/>
-<br /><br />
-<Input 
-  type="text" 
-  width="50%"
-  label="Project Description 1"
-  name="projectDescription1"
-  value={this.state.projectDescription1}
-  onChange={this.handleChange}
-  required={true}
-/>
-<br /><br />
-```
-
-### 2. Update `handleChange` Method in React Component
-
-Update the `handleChange` method to handle changes in these new fields:
-
-```jsx
-handleChange = (event) => {
-  const { name, value } = event.target;
-  this.setState({ [name]: value });
-};
-
-handleDateChange = (name, date) => {
-  this.setState({ [name]: date });
-};
-```
-
-### 3. Update Node.js Backend (`index.js`)
-
-Modify your existing `/api/v2/saveUserData` endpoint to handle these additional fields for work experience and projects. Here's an example:
+Update your backend API endpoint to return both a success message and the `userId`:
 
 ```javascript
 api.post('/api/v2/saveUserData', async (req, res) => {
-  console.log("inside index ");
   const {
     first_name,
     last_name,
@@ -137,50 +44,63 @@ api.post('/api/v2/saveUserData', async (req, res) => {
     // Insert into project table (assuming you have a similar DAO method)
     await resumeDataDAO.sendProject(userId, projectTitle1, projectDescription1);
 
-    res.status(200).send("Data saved successfully");
+    res.status(200).json({ success: true, message: 'Data saved successfully', userId });
   } catch (error) {
     console.error('Error saving user data:', error.message);
-    res.status(500).send('Failed to save data');
+    res.status(500).json({ success: false, message: 'Failed to save data' });
   }
 });
 ```
 
-### 4. Update DAO Methods in Node.js Backend
+### 2. Update React Frontend (`apps.js`)
 
-Update your DAO methods (`sendWorkExperience` and `sendProject`) to handle the insertion into respective tables (`work_experience` and `project`).
-
-### Example DAO Methods (in `ResumeDataDAO` class):
+Modify your frontend code to handle the response with both success message and `userId`:
 
 ```javascript
-async sendWorkExperience(userId, company, jobTitle, startDate, endDate, description) {
-  try {
-    const query = 'INSERT INTO work_experience (user_id, company, job_title, start_date, end_date, description) VALUES (?, ?, ?, ?, ?, ?)';
-    const values = [userId, company, jobTitle, startDate, endDate, description];
-    await this.db.raw(query, values);
-    return true;
-  } catch (err) {
-    console.error('Failed to save work experience:', err.stack);
-    throw err;
-  }
-}
+handleSubmit = async (event) => {
+  event.preventDefault();
+  const { first_name, last_name, phone, email, location, languages, university, university_location, major, gpa, coursework } = this.state;
 
-async sendProject(userId, title, description) {
-  try {
-    const query = 'INSERT INTO project (user_id, title, description) VALUES (?, ?, ?)';
-    const values = [userId, title, description];
-    await this.db.raw(query, values);
-    return true;
-  } catch (err) {
-    console.error('Failed to save project:', err.stack);
-    throw err;
+  const response = await fetch('/api/v2/saveUserData', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ first_name, last_name, phone, email, location, languages, university, university_location, major, gpa, coursework }),
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    const { success, message, userId } = data;
+    if (success) {
+      alert(`${message} User ID: ${userId}`);
+      // Optionally, update state or perform other actions with userId
+      // this.setState({ userId });
+    } else {
+      alert('User Data save failed!');
+    }
+  } else {
+    alert('Network error or failed to fetch');
   }
-}
+};
 ```
 
-### Notes:
+### Explanation:
 
-- Ensure your database schema (`work_experience`, `project`) matches the queries used in DAO methods.
-- Implement appropriate error handling and validation based on your application requirements.
-- Adjust the frontend and backend code as per your actual UI components and API structure.
+- **Backend (`index.js`)**:
+  - After successfully inserting user data into the database (`user_data` table) and related tables (e.g., `education`, `work_experience`, `project`), the `userId` is retrieved.
+  - The API endpoint returns a JSON response with `success`, `message`, and `userId`.
 
-By following these steps, you can integrate handling for work experience and project data into your existing application flow. Adjustments may be needed based on your specific requirements and the exact structure of your frontend and backend components.
+- **Frontend (`apps.js`)**:
+  - In the `handleSubmit` method, after sending data to the backend, it awaits the response.
+  - If the response is successful (`response.ok`), it parses the JSON response to extract `success`, `message`, and `userId`.
+  - It then displays an alert with the success message and includes the `userId`.
+  - Error handling includes checking for network errors or failures to fetch.
+
+### Additional Notes:
+
+- Ensure your backend and frontend are properly configured to handle JSON responses and CORS (Cross-Origin Resource Sharing) if necessary.
+- Consider enhancing error handling and validation based on your application requirements.
+- You can use the `userId` in your frontend for further operations, such as navigating to a user profile page or displaying additional user-specific information.
+
+This approach allows you to communicate both success status and the `userId` back to your React frontend, providing a clear indication of data saving operations along with essential user identification. Adjustments can be made based on specific application needs and architecture.
