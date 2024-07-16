@@ -2,6 +2,14 @@ const api = require('lambda-api')();
 require('dotenv').config();
 const ResumeDataDAO = require('./ResumeDataDAO');
 
+// Enable CORS for all routes
+api.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    next();
+});
+
 api.get('/api/v2/hello', async (req, res) => {
     try {
         const data = 'hello world!';
@@ -35,7 +43,6 @@ api.get('/api/v2/resume', async (req, res) => {
     }
 });
 
-
 api.post('/api/v1/saveUserData', async (req, res) => {
     console.log("inside index ");
     const {first_name, last_name, phone, email, location, languages } = req.body;
@@ -52,8 +59,6 @@ api.post('/api/v1/saveUserData', async (req, res) => {
         res.status(500).send('Failed to save data');
     }
 });
-  
-
 
 exports.handler = async (event, context) => {
     return await api.run(event, context);
