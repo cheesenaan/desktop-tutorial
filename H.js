@@ -1,5 +1,13 @@
-ERROR:  Failing row contains (null, John, Doe, 1234567890, john.doe@example.com, New York, English, Spanish).null value in column "user_id" of relation "user_data" violates not-null constraint 
+CREATE SEQUENCE user_data_user_id_seq;
 
-ERROR:  null value in column "user_id" of relation "user_data" violates not-null constraint
-SQL state: 23502
-Detail: Failing row contains (null, John, Doe, 1234567890, john.doe@example.com, New York, English, Spanish).
+CREATE TABLE user_data (
+    user_id    INTEGER DEFAULT nextval('user_data_user_id_seq') PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name  VARCHAR(255),
+    phone      NUMERIC,
+    email      VARCHAR(255),
+    location   VARCHAR(255),
+    languages  VARCHAR(255)
+);
+
+ALTER SEQUENCE user_data_user_id_seq OWNED BY user_data.user_id;
