@@ -1,28 +1,3 @@
-index.js file
-
-const api = require('lambda-api')();
-require('dotenv').config();
-const ResumeDataDAO = require('./ResumeDataDAO');
-
-
-api.get('/resume', async (req, res) => {
-    try {
-        const { user_id } = req.query; // Get user_id from query parameters
-        if (!user_id) {
-            return res.status(400).json({ error: 'user_id is required' });
-        }
-
-        const resumeDataDAO = new ResumeDataDAO();
-        const data = await resumeDataDAO.getResumeData(user_id);
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
-ResumeDataDAO.js file
-
 require('dotenv').config();
 const knex = require('knex');
 
@@ -45,7 +20,7 @@ class ResumeDataDAO {
 
     async getUserData(user_id) {
         try {
-            const user_data = await this.db.raw('resume = ?', [user_id]);
+            const user_data = await this.db.raw('SELECT * FROM user_data WHERE user_id = ?', [user_id]);
             return user_data.rows;
         } catch (error) {
             console.error("Error fetching user data:", error.message);
@@ -100,7 +75,7 @@ class ResumeDataDAO {
             console.error("Error fetching resume data:", error.message);
             throw error;
         }
+    }
+}
 
-
-        in postman when i run get http://127.0.0.1:3000/resume?user_id=1 i get error     "error": "resume = $1 - syntax error at or near \"resume\""
-
+module.exports = ResumeDataDAO;
