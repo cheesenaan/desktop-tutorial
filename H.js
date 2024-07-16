@@ -1,4 +1,6 @@
+To use the `userId` obtained from the `handleSubmit` method in your `getResumeData` method in React, you can modify the `getResumeData` function to accept a `userId` parameter and use it in the fetch URL. Here’s how you can do it:
 
+```javascript
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -23,7 +25,7 @@ export default class App extends Component {
       description1: '',
       projectTitle1: '',
       projectDescription1: '',
-
+      userId: null, // Added userId state
     };
   }
 
@@ -55,6 +57,7 @@ export default class App extends Component {
       const { success, message, userId } = data;
       if (success) {
         alert(`${message} User ID: ${userId}`);
+        this.setState({ userId }); // Update userId state
         // Optionally, update state or perform other actions with userId
         // this.setState({ userId });
       } else {
@@ -66,8 +69,11 @@ export default class App extends Component {
   };
 
   getResumeData = async () => {
+    const { userId } = this.state; // Get userId from state
     try {
-      const response = await fetch('api/v2/resume?user_id=1', { mode: 'no-cors' });
+      const response = await fetch(`api/v2/resume?user_id=${userId}`, {
+        mode: 'no-cors',
+      });
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
@@ -78,3 +84,38 @@ export default class App extends Component {
       this.setState({ error: 'Failed to fetch resume data. Please try again later.' });
     }
   };
+
+  render() {
+    // Render your form and other components
+    return (
+      <div>
+        {/* Your form and other components */}
+        <form onSubmit={this.handleSubmit}>
+          {/* Form inputs */}
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    );
+  }
+}
+```
+
+### Explanation:
+
+1. **State Management**: Added `userId` to the component's state to store the user ID retrieved after successful data submission.
+
+2. **handleSubmit**: Updated to set `userId` in state upon successful submission. This allows subsequent functions, like `getResumeData`, to access the `userId`.
+
+3. **getResumeData**: Modified to use the `userId` state in the fetch URL (`api/v2/resume?user_id=${userId}`). This ensures that the request retrieves resume data specific to the user whose ID was obtained from the form submission.
+
+4. **Rendering**: The render method includes a basic form structure (`<form onSubmit={this.handleSubmit}>`) for capturing user input and submitting data.
+
+### Notes:
+
+- Ensure that the `handleSubmit` method correctly updates the `userId` state upon successful submission. You may need to adjust state management based on your application’s requirements (e.g., resetting state after submission or handling errors).
+  
+- Handle potential network errors or failed fetch requests in both `handleSubmit` and `getResumeData` methods for robust error handling and user feedback.
+
+- Adjust the `fetch` URLs (`'api/v2/saveUserData'` and `'api/v2/resume'`) to match your actual backend API endpoints.
+
+By following these steps, you can effectively use the `userId` obtained from form submission (`handleSubmit`) to fetch and display resume data specific to that user in your React application.
