@@ -65,8 +65,6 @@ ALTER TABLE work_experience
     ADD CONSTRAINT work_experience_user_data_fk FOREIGN KEY ( user_id )
         REFERENCES user_data ( user_id );
 
-
-
 -- Oracle SQL Developer Data Modeler Summary Report: 
 -- 
 -- CREATE TABLE                             4
