@@ -51,6 +51,57 @@
               onClick: () => alert('You clicked the Button example!'),
             },
           ]}
+
+
+
+
+
+            above is not working
+here is how the json looks like
+
+{
+  "user_data": [
+    {
+      "user_id": 21,
+      "first_name": "sulemaan",
+      "last_name": "farooq",
+      "phone": "111111111",
+      "email": "sule@gmail.com",
+      "location": "California",
+      "languages": "a"
+    }
+  ],
+  "education": [
+    {
+      "education_id": 16,
+      "university": "a",
+      "major": "a",
+      "gpa": 1.1,
+      "coursework": "a",
+      "location": "a",
+      "user_id": 21
+    }
+  ],
+  "work_experience": [
+    {
+      "work_experience_id": 9,
+      "title": "a",
+      "company": "a",
+      "description": "a",
+      "start_date": "2024-07-17T00:00:00.000Z",
+      "end_date": "2024-07-19T00:00:00.000Z",
+      "user_id": 21
+    }
+  ],
+  "projects": [
+    {
+      "project_id": 9,
+      "title": "a",
+      "description": "a",
+      "user_id": 21
+    }
+  ]
+}
         />
       </div>
     </div>
