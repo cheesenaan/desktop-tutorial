@@ -1,40 +1,16 @@
-Adding `.env` to your `.gitignore` file will not automatically remove it from GitLab or your repository's history. It will simply ensure that future changes to the `.env` file are not tracked by Git. If you want to remove the `.env` file from GitLab, you'll need to manually untrack it.
 
-Here’s how you can handle this situation:
+<div id='display_resume'> 
+          {error && <div style={{ color: 'red' }}>{error}</div>}
 
-1. **Add `.env` to `.gitignore`**: Add `.env` to your `.gitignore` file to ensure that it is ignored in the future.
+          {resumeData && (
+            <div>
+              <h3>Resume Data:</h3>
+              <pre>{JSON.stringify(resumeData, null, 2)}</pre>
+            </div>
+          )}
+        </div>
 
-   ```plaintext
-   .env
-   ```
 
-2. **Untrack the `.env` File**: To remove the `.env` file from the repository but keep it on your local filesystem, use the following command:
+the following are in the JSON : first_name, last_name, phone, email, location, languages, university, university_location, major, gpa, coursework, company1,jobTitle1, startDate1, endDate1, description1, projectTitle1, projectDescription1
 
-   ```bash
-   git rm --cached .env
-   ```
-
-   This command stops tracking the `.env` file without deleting it from your local directory.
-
-3. **Commit the Changes**: Commit this change to your repository.
-
-   ```bash
-   git commit -m "Stop tracking .env file"
-   ```
-
-4. **Push the Changes to GitLab**: Push the commit to your GitLab repository.
-
-   ```bash
-   git push origin your-branch-name
-   ```
-
-### Summary of Commands
-
-```bash
-echo ".env" >> .gitignore
-git rm --cached .env
-git commit -m "Stop tracking .env file"
-git push origin your-branch-name
-```
-
-After following these steps, the `.env` file will no longer be tracked by Git, and future changes to the `.env` file will be ignored. The `.env` file will still exist in the repository history, but it won't appear in the latest commit or be tracked going forward.
+give me code to display resumeData with something like resumeData.phone, resumeData.coursework etc
