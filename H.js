@@ -1,24 +1,13 @@
-constructor(props) {
-    super(props);
-    this.state = {
-      userId: null,
-      first_name: '',
-      last_name: '',
-      phone: '',
-      email: '',
-      location: '',
-      languages: '',
-      university: '',
-      university_location: '',
-      major: '',
-      gpa: '',
-      coursework: '',
-      company1: '',
-      jobTitle1: '',
-      startDate1: '',
-      endDate1: '',
-      description1: '',
-      projectTitle1: '',
-      projectDescription1: '',
-    };
-  }
+if (response.ok) {
+        const data = await response.json();
+        const { success, message, userId } = data;
+        if (success) {
+          alert(`${message} User ID: ${userId}`);
+          this.setState({ userId: userId });
+
+        } else {
+          alert('User Data save failed!');
+        }
+
+the state is not being updated
+    give me console logs to debug 
