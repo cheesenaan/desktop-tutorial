@@ -1,3 +1,4 @@
+
 class DisplayResume extends Component {
   constructor(props) {
     super(props);
@@ -70,7 +71,7 @@ class DisplayResume extends Component {
           
           <div id='display_resume_1' style={{ display_resume_1_style }}>
             <div id='display_resume_1_text_area'>
-              <pre>{JSON.stringify(resumeData, null, 2)}</pre>
+              <pre>{JSON.stringify(resumeData, null, 2)}
               <TitleLockup
                 id='hero-title'
                 surface="dark"
@@ -114,6 +115,7 @@ class DisplayResume extends Component {
                   },
                 ]}
               />
+              </pre>
             </div>
           </div>
         )}
