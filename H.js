@@ -1,21 +1,27 @@
-<DisplayResume
-          userId={this.userId}
-        />
+import React, { Component } from 'react';
 
+class DisplayResume extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userId: props.userId,
+      resumeData: null,
+      error: null,
+    };
+  }
 
-give me code for DisplayResume componennt
-DisplayResume componennt will have a button called "get resume data"
-when clicked, the "get resume data" button will run the function get_resume_data(userId) with userId as a paramater
-the function will return data
-getResumeData = async () => { // userId as paramarer
+  getResumeData = async () => {
+    const { userId } = this.state;
+
     try {
-      const { userId } = this.state; 
       const response = await fetch(`api/v2/resume?user_id=${userId}`, {
-        mode: 'no-cors',
+        mode: 'no-cors', // Adjust as per your CORS setup
       });
+
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
+
       const data = await response.json();
       this.setState({ resumeData: data, error: null });
     } catch (error) {
@@ -24,5 +30,24 @@ getResumeData = async () => { // userId as paramarer
     }
   };
 
-then there should be code to display the data and any error messages
+  render() {
+    const { resumeData, error } = this.state;
 
+    return (
+      <div>
+        <button onClick={this.getResumeData}>Get Resume Data</button>
+        {error && <p>{error}</p>}
+        {resumeData && (
+          <div>
+            {/* Display resume data here */}
+            <p>User ID: {resumeData.userId}</p>
+            <p>Name: {resumeData.name}</p>
+            {/* Example fields; replace with actual resume data structure */}
+          </div>
+        )}
+      </div>
+    );
+  }
+}
+
+export default DisplayResume;
