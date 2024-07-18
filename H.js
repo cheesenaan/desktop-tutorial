@@ -1,14 +1,10 @@
-app.js
+import React, { useState } from 'react';
+import ButtonGroup from './ButtonGroup'; // Assuming ButtonGroup component is imported
+import TitleLockup from './TitleLockup'; // Assuming TitleLockup component is imported
 
-<DisplayResume
-          userId={this.userId}
-          state={this.state}
-        />
-
-
-components/DisplayResume.js
-
-const DisplayResume = ({ userId }) => {
+const DisplayResume = ({ userId, state }) => {
+  const [resumeData, setResumeData] = useState(null);
+  const [error, setError] = useState(null);
 
   const getResumeData = async () => {
     try {
@@ -26,10 +22,11 @@ const DisplayResume = ({ userId }) => {
       }
 
       const data = await response.json();
-      this.setState({ resumeData: data, error: null });
+      setResumeData(data);
+      setError(null);
     } catch (error) {
       console.error('Failed to fetch resume data:', error);
-      this.setState({ error: 'Failed to fetch resume data. Please try again later.' });
+      setError('Failed to fetch resume data. Please try again later.');
     }
   };
 
@@ -120,21 +117,3 @@ const DisplayResume = ({ userId }) => {
 };
 
 export default DisplayResume;
-
-ERROR in [eslint] 
-src/components/DisplayResume.js
-  Line 132:8:    'error' is not defined       no-undef
-  Line 132:67:   'error' is not defined       no-undef
-  Line 134:8:    'resumeData' is not defined  no-undef
-  Line 137:32:   'resumeData' is not defined  no-undef
-  Line 139:12:   'resumeData' is not defined  no-undef
-  Line 148:36:   'resumeData' is not defined  no-undef
-  Line 148:74:   'resumeData' is not defined  no-undef
-  Line 152:36:   'resumeData' is not defined  no-undef
-  Line 152:69:   'resumeData' is not defined  no-undef
-  Line 152:102:  'resumeData' is not defined  no-undef
-  Line 152:138:  'resumeData' is not defined  no-undef
-
-Search for the keywords to learn more about each error.
-
-webpack compiled with 1 error and 1 warning
