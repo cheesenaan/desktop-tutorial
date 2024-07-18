@@ -1,83 +1,125 @@
-saveUserData = async (event) => {
-  event.preventDefault();
+app.js
 
-  // Destructure state variables
-  const {
-    first_name, last_name, phone, email, location, languages,
-    university, university_location, major, gpa, coursework,
-    company1, jobTitle1, startDate1, endDate1, description1,
-    projectTitle1, projectDescription1
-  } = this.state;
+import DisplayResume from "./components/DisplayResume.js";
 
-  // Define required fields with their names
-  const requiredFields = [
-    { value: first_name, name: 'First Name' },
-    { value: last_name, name: 'Last Name' },
-    { value: phone, name: 'Phone Number' },
-    { value: email, name: 'Email Address' },
-    { value: location, name: 'Location' },
-    { value: languages, name: 'Languages' },
-    { value: university, name: 'University' },
-    { value: university_location, name: 'University Location' },
-    { value: major, name: 'Major' },
-    { value: gpa, name: 'GPA' },
-    { value: coursework, name: 'Coursework' },
-    { value: company1, name: 'Company Name (Job 1)' },
-    { value: jobTitle1, name: 'Job Title (Job 1)' },
-    { value: startDate1, name: 'Start Date (Job 1)' },
-    { value: endDate1, name: 'End Date (Job 1)' },
-    { value: description1, name: 'Description (Job 1)' },
-    { value: projectTitle1, name: 'Project Title (Project 1)' },
-    { value: projectDescription1, name: 'Project Description (Project 1)' }
-  ];
 
-  // Array to store names of missing fields
-  const missingFields = [];
+<DisplayResume
+          userId={this.userId}
+        />
 
-  // Check for missing fields
-  requiredFields.forEach(field => {
-    if (field.value === null || field.value === '') {
-      missingFields.push(field.name);
-    }
-  });
 
-  // If any fields are missing, show alert and return
-  if (missingFields.length > 0) {
-    const missingFieldsList = missingFields.join(', ');
-    alert(`Please fill in the following required fields: ${missingFieldsList}`);
-    return;
-  }
-
-  // If all fields are filled, proceed with API call
+components/DisplayResume.js
+getResumeData = async () => {
   try {
-    const response = await fetch('api/v2/saveUserData', {
-      mode: 'no-cors',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        first_name, last_name, phone, email, location, languages,
-        university, university_location, major, gpa, coursework,
-        company1, jobTitle1, startDate1, endDate1, description1,
-        projectTitle1, projectDescription1
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const { success, message, userId } = data;
-      if (success) {
-        this.setState({ userId });
-        alert(`${message} User ID: ${userId}`);
-      } else {
-        alert('User Data save failed!');
-      }
-    } else {
-      alert('Network error or failed to fetch');
+    const { userId } = this.state; 
+    if (userId == null) {
+      alert("please fill in the form first !");
+      return;
     }
+    const response = await fetch(`api/v2/resume?user_id=${userId}`, {
+      mode: 'no-cors',
+    });
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    const data = await response.json();
+    this.setState({ resumeData: data, error: null });
   } catch (error) {
-    console.error('Error saving user data:', error);
-    alert('Failed to save user data. Please try again later.');
+    console.error('Failed to fetch resume data:', error);
+    this.setState({ error: 'Failed to fetch resume data. Please try again later.' });
   }
 };
+
+const DisplayResume= () => (
+
+      <div style={resumeSubmitButton}> 
+      <br /><br /><br /><br /><br />
+      <ButtonGroup
+        childwidth="100%"
+        viewport="desktop"
+        rowQuantity={{ desktop: 2 }}
+        data={[
+          {
+            children: 'Get resume data (test)',
+            size: 'large',
+            use: 'primary',
+            width: 'auto',
+            onClick: this.getResumeData
+          },
+          {
+            children: 'Cancel',
+            size: 'large',
+            use: 'textLink',
+            width: 'auto'
+          }
+        ]}
+        alignment="center"
+      />
+      <br /><br /><br /><br /><br />
+
+
+
+    <div id='display_resume'> 
+    {error && <div style={{ color: 'red' }}>{error}</div>}
+
+    {resumeData && (
+    <div>
+      <h3>Resume Data:</h3>
+      <pre>{JSON.stringify(resumeData, null, 2)}</pre>
+
+      {resumeData.user_data.length > 0 && (
+          <div id='display_resume_1' style={display_resume_1_style}> 
+            <div id='display_resume_1_text_area' style={display_resume_1_text_area_style}> 
+              <br /><br /><br /><br /><br /><br />
+
+              <TitleLockup
+                id='hero-title'
+                surface="dark"
+                data={{
+                  title: {
+                    size: 'title2XLarge',
+                    children: `${resumeData.user_data[0].first_name} ${resumeData.user_data[0].last_name}`,
+                  },
+                  subtitle: {
+                    size: 'titleMedium',
+                    children: `${resumeData.user_data[0].phone} ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ${resumeData.user_data[0].email} ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ${resumeData.user_data[0].location} ‎ ‎ ‎  ‎ ‎ ‎ ‎ ‎ ‎ ${resumeData.user_data[0].languages}`,
+                  },
+                }}
+              />   
+              <br /> 
+
+              <TitleLockup
+                id='hero-title'
+                surface="dark"
+                data={{
+                  eyebrow: {
+                    size: 'title2XLarge',
+                    children: 'Please click continue to view your resume powered by the fastest 5G in the world',
+                  },
+                }}
+              />
+              <br /> <br />
+
+              <ButtonGroup
+                id='hero-buttons'
+                childWidth={'100%'}
+                viewport={'desktop'}
+                surface="dark"
+                rowQuantity={{ desktop: 2 }}
+                alignment={'left'}
+                data={[
+                  {
+                    children: 'Continue',
+                    size: 'medium',
+                    use: 'secondary',
+                    width: '150px',
+                    onClick: () => alert('You clicked the Button example!'),
+                  },
+                ]}
+              />
+            </div>
+          </div>
+
+
+
+fix the code
