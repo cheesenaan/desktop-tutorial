@@ -1,72 +1,8 @@
-import React, { Component, Fragment } from 'react';
-import HeroSection from './components/HeroSection';
-import Section2 from './components/Section2';
-import ResumeSection from './components/ResumeSection';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      first_name: '',
-      last_name: '',
-      phone: '',
-      email: '',
-      location: '',
-      languages: '',
-      university: '',
-      university_location: '',
-      major: '',
-      gpa: '',
-      coursework: '',
-      company1: '',
-      jobTitle1: '',
-      startDate1: '',
-      endDate1: '',
-      description1: '',
-      projectTitle1: '',
-      projectDescription1: '',
-    };
-  }
-
-  handleChange = (event) => {
-    const { name, value } = event.target;
-    this.setState({ [name]: value });
-  };
-
-  handleDateChange = (name, date) => {
-    this.setState({ [name]: date });
-  };
-
-  saveUserData = async (event) => {
-    event.preventDefault();
+class ResumeSection extends Component {
+  render() {
     const {
-      first_name,
-      last_name,
-      phone,
-      email,
-      location,
-      languages,
-      university,
-      university_location,
-      major,
-      gpa,
-      coursework,
-      company1,
-      jobTitle1,
-      startDate1,
-      endDate1,
-      description1,
-      projectTitle1,
-      projectDescription1,
-    } = this.state;
-
-    const response = await fetch('api/v2/saveUserData', {
-      mode: 'no-cors',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+      state: {
         first_name,
         last_name,
         phone,
@@ -81,41 +17,226 @@ class App extends Component {
         company1,
         jobTitle1,
         startDate1,
-        endDate1,
-        description1,
+        endDate1
+                description1,
         projectTitle1,
         projectDescription1,
-      }),
-    });
+      },
+      handleChange,
+      handleDateChange,
+      saveUserData,
+    } = this.props;
 
-    if (response.ok) {
-      const data = await response.json();
-      const { success, message, userId } = data;
-      if (success) {
-        this.setState({ userId });
-        alert(`${message} User ID: ${userId}`);
-      } else {
-        alert('User Data save failed!');
-      }
-    } else {
-      alert('Network error or failed to fetch');
-    }
-  };
-
-  render() {
     return (
-      <Fragment>
-        <HeroSection />
-        <Section2 />
-        <ResumeSection
-          state={this.state}
-          handleChange={this.handleChange}
-          handleDateChange={this.handleDateChange}
-          saveUserData={this.saveUserData}
+      <div id="resume-build" style={resumeBuild}>
+        <br />  <br /> <br />
+
+        <TitleLockup
+          id="resume-build-title"
+          surface="light"
+          textAlignment="center"
+          data={{
+            title: {
+              size: 'title2XLarge',
+              children: 'Resume Builder',
+            },
+          }}
         />
-      </Fragment>
+        <br /> <br /> <br />
+        <form id="resume-build-form" style={formStyle} onSubmit={saveUserData}>
+          <Input
+            id="first_name"
+            width="50%"
+            label="First Name"
+            name="first_name"
+            onChange={handleChange}
+            value={first_name}
+            required
+          /> <br />
+          <Input
+            id="last_name"
+            label="Last Name"
+            name="last_name"
+            onChange={handleChange}
+            width="50%"
+            value={last_name}
+            required
+          /> <br />
+          <Input
+            id="phone"
+            label="Phone"
+            name="phone"
+            onChange={handleChange}
+            width="50%"
+            value={phone}
+            required
+          /> <br />
+          <Input
+            id="email"
+            label="Email"
+            name="email"
+            onChange={handleChange}
+            width="50%"
+            value={email}
+            required
+          /> <br />
+          <Input
+            id="location"
+            label="Location"
+            name="location"
+            onChange={handleChange}
+            width="50%"
+            value={location}
+            required
+          /> <br />
+          <Input
+            id="languages"
+            label="Languages"
+            name="languages"
+            onChange={handleChange}
+            width="50%"
+            value={languages}
+            required
+          /> <br />
+          <Input
+            id="university"
+            label="University"
+            name="university"
+            onChange={handleChange}
+            width="50%"
+            value={university}
+            required
+          /> <br />
+          <Input
+            id="university_location"
+            label="University Location"
+            name="university_location"
+            onChange={handleChange}
+            width="50%"
+            value={university_location}
+            required
+          /> <br />
+          <Input
+            id="major"
+            label="Major"
+            name="major"
+            onChange={handleChange}
+            width="50%"
+            value={major}
+            required
+          /> <br />
+          <Input
+            id="gpa"
+            label="GPA"
+            name="gpa"
+            width="50%"
+            onChange={handleChange}
+            value={gpa}
+            required
+          /> <br />
+          <Input
+            id="coursework"
+            label="Coursework"
+            name="coursework"
+            onChange={handleChange}
+            width="50%"
+            value={coursework}
+            required
+          /> <br />
+          <Input
+            id="company1"
+            label="Company"
+            name="company1"
+            onChange={handleChange}
+            width="50%"
+            value={company1}
+            required
+          /> <br />
+          <Input
+            id="jobTitle1"
+            label="Job Title"
+            name="jobTitle1"
+            onChange={handleChange}
+            width="50%"
+            value={jobTitle1}
+            required
+          /> <br />
+          <DatePicker
+            id="startDate1"
+            label="Start Date"
+            onChange={(date) => handleDateChange('startDate1', date)}
+            width="70.7%"
+            value={startDate1}
+            required
+          /> <br />
+          <DatePicker
+            id="endDate1"
+            label="End Date"
+            onChange={(date) => handleDateChange('endDate1', date)}
+            width="70.7%"
+            value={endDate1}
+            required
+          /> <br />
+          <Input
+            id="description1"
+            label="Description"
+            name="description1"
+            onChange={handleChange}
+            width="50%"
+            value={description1}
+            required
+          /> <br />
+          <Input
+            id="projectTitle1"
+            label="Project Title"
+            name="projectTitle1"
+            onChange={handleChange}
+            width="50%"
+            value={projectTitle1}
+            required
+          /> <br />
+          <Input
+            id="projectDescription1"
+            label="Project Description"
+            name="projectDescription1"
+            onChange={handleChange}
+            width="50%"
+            value={projectDescription1}
+            required
+          /> <br />
+
+          <div style={resumeSubmitButton}>
+            <ButtonGroup
+              id="resume-submit"
+              childWidth="100%"
+              viewport="desktop"
+              surface="light"
+              rowQuantity={{ desktop: 2 }}
+              alignment="center"
+              data={[
+                {
+                  children: 'Save',
+                  size: 'large',
+                  use: 'primary',
+                  width: '100px',
+                  onClick: saveUserData,
+                },
+                {
+                  children: 'Cancel',
+                  size: 'large',
+                  use: 'textLink',
+                  width: '100px',
+                  onClick: () => alert('You clicked the cancel button!'),
+                }
+              ]}
+            />
+          </div>
+          <br />  <br />  <br />
+
+        </form>
+      </div>
     );
   }
 }
 
-export default App;
+export default ResumeSection;
