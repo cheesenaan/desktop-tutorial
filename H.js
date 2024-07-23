@@ -1,7 +1,16 @@
+Sure, let's refactor your code into separate files for better organization and maintainability. Here's how you can structure it:
+
+1. **index.js**: General setup like CORS options, reading from configuration files, setting up the API, and importing routes.
+2. **routes.js**: Defines the routes and their corresponding handlers.
+3. **handlers.js**: Contains the handler functions for the routes.
+
+### 1. `index.js`
+```javascript
 const api = require('lambda-api')();
 require('dotenv').config();
-const ResumeDataDAO = require('./ResumeDataDAO');
 const cors = require('cors');
+const routes = require('./routes');
+const ResumeDataDAO = require('./ResumeDataDAO');
 
 const corsOptions = {
     origin: 'http://localhost:3001', // Allow only requests from this origin
@@ -11,26 +20,49 @@ const corsOptions = {
 
 api.use(cors(corsOptions));
 
+// Use the routes
+routes(api);
 
-api.get('/api/v2/hello', async (req, res) => {
+exports.handler = async (event, context) => {
+    return await api.run(event, context);
+};
+```
+
+### 2. `routes.js`
+```javascript
+const handlers = require('./handlers');
+
+module.exports = (api) => {
+    api.get('/api/v2/hello', handlers.hello);
+    api.get('/api/v2/home', handlers.home);
+    api.get('/api/v2/resume', handlers.getResume);
+    api.post('/api/v2/saveUserData', handlers.saveUserData);
+};
+```
+
+### 3. `handlers.js`
+```javascript
+const ResumeDataDAO = require('./ResumeDataDAO');
+
+module.exports.hello = async (req, res) => {
     try {
         const data = 'hello world!';
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 
-api.get('/api/v2/home', async (req, res) => {
+module.exports.home = async (req, res) => {
     try {
         const data = 'welcome to the home page!';
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 
-api.get('/api/v2/resume', async (req, res) => {
+module.exports.getResume = async (req, res) => {
     try {
         const { user_id } = req.query; // Get user_id from query parameters
         if (!user_id) {
@@ -43,10 +75,9 @@ api.get('/api/v2/resume', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 
-
-api.post('/api/v2/saveUserData', async (req, res) => {
+module.exports.saveUserData = async (req, res) => {
     console.log("inside index ");
     const {
       first_name,
@@ -91,23 +122,19 @@ api.post('/api/v2/saveUserData', async (req, res) => {
         console.error('Error saving user data:', error.message);
         res.status(500).json({ success: false, message: 'Failed to save data' });
       }
-  });
-  
-
-exports.handler = async (event, context) => {
-    return await api.run(event, context);
 };
+```
 
+### Directory Structure
+```
+your-project/
+│
+├── index.js
+├── routes.js
+├── handlers.js
+├── ResumeDataDAO.js
+├── package.json
+└── .env
+```
 
-
-Let's try to break the code into different files depending of the function of the code.
-
-Let's have in the Index file just general code like Setting up the CORS options, reading from the configuration files, setting up the DB Access, setting up the etc.
-
-Let's have another file just for the routes called routes.js
-
-Let's have another file for the routes handler called handler.js In this file you basically have functions that handles the actions that occur when a route is accessed. Example:
-
-module.exports.getResumeDetails = async (req, res) => {
-  res.status(200).json(await dao.getResume());
-};
+This structure separates your concerns, making the codebase easier to maintain and expand. Each file has a clear responsibility, and you can easily find and update the code related to a specific part of your application.
