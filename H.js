@@ -1,3 +1,18 @@
+To render a new HTML page with the URL `localhost/user_id` that displays the resume for any user ID, you can use React Router to manage the routes and dynamic URL parameters. This allows you to create a separate page component to display the resume data.
+
+First, install React Router if you haven't already:
+
+```bash
+npm install react-router-dom
+```
+
+Next, set up React Router in your `App.js` file and create a new component, `ResumePage`, to display the resume data. Here’s how you can modify your code:
+
+### Step 1: Update `App.js`
+
+Add React Router and create routes for the main application and the resume page.
+
+```jsx
 import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import VDSManager from './VDSManager';
@@ -178,3 +193,92 @@ class App extends Component {
 }
 
 export default App;
+```
+
+### Step 2: Create `ResumePage.js`
+
+Create a new component `ResumePage` to fetch and display the resume data for the given user ID.
+
+```jsx
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import Loader from './Loader';
+
+class ResumePage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userId: this.props.match.params.userId,
+      resumeData: null,
+      error: null,
+      isLoading: false,
+    };
+  }
+
+  componentDidMount() {
+    this.getResumeData();
+  }
+
+  getResumeData = async () => {
+    const { userId } = this.state;
+    console.log("userId id is ", userId);
+
+    if (!userId) {
+      alert("User ID is undefined!");
+      return;
+    }
+
+    this.setState({ isLoading: true }, () => {
+      console.log('isLoading State for getResumeData updated to true successfully:', this.state.isLoading);
+    });
+
+    try {
+      const response = await fetch(`api/v1/resume?user_id=${userId}`, {
+        mode: 'no-cors', // Adjust as per your CORS setup
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      this.setState({ resumeData: data, error: null });
+    } catch (error) {
+      console.error('Failed to fetch resume data:', error);
+      this.setState({ error: 'Failed to fetch resume data. Please try again later.' });
+    }
+
+    this.setState({ isLoading: false }, () => {
+      console.log('isLoading State for getResumeData updated to false successfully:', this.state.isLoading);
+    });
+  };
+
+  render() {
+    const { resumeData, error } = this.state;
+
+    return (
+      <div>
+        <Loader
+          active={this.state.isLoading}
+          fullscreen={true}
+          surface="light"
+        />
+
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {resumeData && (
+          <div>
+            {/* Render resume data here */}
+            <h1>{resumeData.first_name} {resumeData.last_name}</h1>
+            <p>{resumeData.email}</p>
+            {/* Add more fields as needed */}
+          </div>
+        )}
+      </div>
+    );
+  }
+}
+
+export default withRouter(ResumePage);
+```
+
+Now, when you navigate to `localhost/user_id`, the `ResumePage` component will fetch and display the resume data for the given `user_id`. This approach uses React Router to handle dynamic URL
