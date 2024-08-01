@@ -1,20 +1,18 @@
 
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
 
-resources:
-  resumefunction:
-    type: 'aws::serverless::function'
-    properties:
-      handler: functions/resume/index.handler
-      runtime: nodejs14.x
-      codeuri: .
-      events:
-        resumeapi:
-          type: api
-          properties:
-            path: /api/v1/resume
-            method: get
+Resources:
+  ResumeFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: functions/resume/index.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      Events:
+        ResumeApi:
+          Type: Api
+          Properties:
+            Path: /api/v1/resume
+            Method: get
       Tags:
         - Key: UserID
           Value: !Ref UserID
@@ -27,16 +25,16 @@ resources:
         - Key: Role
           Value: !Ref Role
 
-  resumetargetgroup:
-    type: 'aws::elasticloadbalancingv2::targetgroup'
-    properties:
-      name: resumetargetgroup
-      protocol: http
-      port: 80
-      vpcid: !Ref vpcid 
-      targettype: lambda
-      targets:
-        - id: !Ref resumefunction
+  ResumeTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: resumetargetgroup
+      Protocol: HTTP
+      Port: 80
+      VpcId: !Ref VpcId 
+      TargetType: lambda
+      Targets:
+        - Id: !Ref ResumeFunction
       Tags:
         - Key: UserID
           Value: !Ref UserID
@@ -49,33 +47,34 @@ resources:
         - Key: Role
           Value: !Ref Role
 
-  saveuserdatafunction:
-    type: 'aws::serverless::function'
-    properties:
-      handler: functions/resume/index.handler
-      runtime: nodejs14.x
-      codeuri: .
-      tags:
-        project: !Ref appid
-      environment:
-        USERID: !Ref userid
-      events:
-        resumeapi:
-          type: api
-          properties:
-            path: /api/v1/saveuserdata
-            method: post
+  SaveUserDataFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: functions/resume/index.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      Tags:
+        project: !Ref AppID
+      Environment:
+        Variables:
+          USERID: !Ref UserID
+      Events:
+        ResumeApi:
+          Type: Api
+          Properties:
+            Path: /api/v1/saveuserdata
+            Method: post
 
-  saveuserdatatargetgroup:
-    type: 'aws::elasticloadbalancingv2::targetgroup'
-    properties:
-      name: saveuserdatatargetgroup
-      protocol: http
-      port: 80
-      vpcid: !Ref vpcid
-      targettype: lambda
-      targets:
-        - id: !Ref saveuserdatafunction
+  SaveUserDataTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: saveuserdatatargetgroup
+      Protocol: HTTP
+      Port: 80
+      VpcId: !Ref VpcId
+      TargetType: lambda
+      Targets:
+        - Id: !Ref SaveUserDataFunction
       Tags:
         - Key: UserID
           Value: !Ref UserID
@@ -88,18 +87,18 @@ resources:
         - Key: Role
           Value: !Ref Role
 
-  readerfunction:
-    type: 'aws::serverless::function' 
-    properties: 
-      handler: functions/reader/index.handler
-      runtime: nodejs14.x
-      codeuri: .
-      events:
-        resumeapi:
-          type: api
-          properties:
-            path: /
-            method: get
+  ReaderFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: functions/reader/index.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      Events:
+        ResumeApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
       Tags:
         - Key: UserID
           Value: !Ref UserID
@@ -112,35 +111,16 @@ resources:
         - Key: Role
           Value: !Ref Role
 
-  readertargetgroup:
-    type: 'aws::elasticloadbalancingv2::targetgroup'
-    properties:
-      name: readertargetgroup
-      protocol: http
-      port: 80
-      vpcid: !Ref vpcid
-      targettype: lambda
-      targets:
-        - id: !Ref readerfunction 
-      Tags:
-        - Key: UserID
-          Value: !Ref UserID
-        - Key: Userid
-          Value: !Ref UserID
-        - Key: Vsad
-          Value: !Ref AppID
-        - Key: Name
-          Value: !Ref AWS::StackName
-        - Key: Role
-          Value: !Ref Role
-  # application load balancer
-  resumealb:
-    type: 'aws::elasticloadbalancingv2::loadbalancer'
-    properties:
-      name: resumealb
-      subnets: !Ref subnetids
-      securitygroups: !Ref securitygroupsids
-      scheme: internet-facing
+  ReaderTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: readertargetgroup
+      Protocol: HTTP
+      Port: 80
+      VpcId: !Ref VpcId
+      TargetType: lambda
+      Targets:
+        - Id: !Ref ReaderFunction
       Tags:
         - Key: UserID
           Value: !Ref UserID
@@ -153,87 +133,72 @@ resources:
         - Key: Role
           Value: !Ref Role
 
-  # http to https listener
-  httplistener:
-    type: 'aws::elasticloadbalancingv2::listener'
-    properties:
-      loadbalancerarn: !Ref resumealb
-      port: 80
-      protocol: http
-      defaultactions:
-        - type: redirect
-          redirectconfig:
-            protocol: https
-            port: '443'
-            statuscode: 'http_301'
+  ResumeALB:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: resumealb
+      Subnets: !Ref SubnetIds
+      SecurityGroups: !Ref SecurityGroupIds
+      Scheme: internet-facing
+      Tags:
+        - Key: UserID
+          Value: !Ref UserID
+        - Key: Userid
+          Value: !Ref UserID
+        - Key: Vsad
+          Value: !Ref AppID
+        - Key: Name
+          Value: !Ref AWS::StackName
+        - Key: Role
+          Value: !Ref Role
 
-  # https listener
-  httpslistener:
-    type: 'aws::elasticloadbalancingv2::listener'
-    properties:
-      loadbalancerarn: !Ref resumealb
-      port: 443
-      protocol: https
-      certificates:
-        - certificatearn: !Ref certificatearn  
-      defaultactions:
-        - type: forward
-          targetgrouparn: !Ref readertargetgroup 
+  HttpListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      LoadBalancerArn: !Ref ResumeALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Protocol: HTTPS
+            Port: '443'
+            StatusCode: HTTP_301
 
-  # listener rule for /api/v1/*
-  apilistenerrule:
-    type: 'aws::elasticloadbalancingv2::listenerrule'
-    properties:
-      listenerarn: !Ref httpslistener
-      priority: 1
-      conditions:
-        - field: path-pattern
-          values:
+  HttpsListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      LoadBalancerArn: !Ref ResumeALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn  
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ReaderTargetGroup
+
+  ApiListenerRule:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      ListenerArn: !Ref HttpsListener
+      Priority: 1
+      Conditions:
+        - Field: path-pattern
+          Values:
             - /api/v1/*
-      actions:
-        - type: forward
-          targetgrouparn: !Ref resumetargetgroup
-
-
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref ResumeTargetGroup
 
 Outputs:
   ResumeApi:
     Description: "API Gateway endpoint URL for ResumeApi function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resume"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api/v1/resume"
 
-  saveUserDataApi:
-    Description: "API Gateway endpoint URL for saveUserDataFunction function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resume"
+  SaveUserDataApi:
+    Description: "API Gateway endpoint URL for SaveUserDataFunction function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api/v1/saveuserdata"
   
-  readerAPI:
-    Description: "API Gateway endpoint URL for readerFunction function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resume"
-
-
-    changed: [localhost]
-
-TASK [Prepare : fail] **********************************************************
-
-fatal: [localhost]: FAILED! => {
-
-    "changed": false
-
-}
-
-MSG:
-
-{'Message': [{'message': 'Illegal cfn - no Resources', 'type': 'FAIL', 'logical_resource_ids': None}], 'Status': 'Fail'}
-
-PLAY RECAP *********************************************************************
-
-localhost                  : ok=18   changed=8    unreachable=0    failed=1    skipped=15   rescued=0    ignored=0   
-
-localhost                  : ok=18   changed=8    unreachable=0    failed=1    skipped=15   rescued=0    ignored=0   
-
-
-
-#$$PLAYBOOK EXECUTION COMPLETED$$#
-
-
-
-
+  ReaderAPI:
+    Description: "API Gateway endpoint URL for ReaderFunction function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
