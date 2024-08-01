@@ -1,3 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Parameters:
+  AppID:
+    Description: The 4-character alpha-numeric ApplID code from VAST-APM
+    Type: String
+    AllowedPattern: '[A-Z0-9]{4}'
+    
+  UserID:
+    Description: The domain id of the resource owner
+    Type: String
+    MinLength: '1'
+    
+  Role:
+    Description: The role of the instances that will be deployed
+    Type: String
+    AllowedValues:
+      - App
+      - DB
+      - Web
+    Default: App
+  CertificateArn:
+    Type: String
+    
+  SecurityGroupsIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    
+  S3Bucket:
+    Type: String
+    Description: S3 bucket where the Lambda code is stored
+    
+  S3Static:
+    Type: String
+    Description: S3 key for the READER Lambda code zip file
+    
+  DBHost:
+    Type: String
+    Description: Database host URL
+    
+  DBUser:
+    Type: String
+    Description: Database user
+    
+  DBPassword:
+    Type: String
+    Description: Database password
+    NoEcho: true
+    
+  DBName:
+    Type: String
+    Description: Database name
 
 Resources:
   ResumeFunction:
@@ -51,11 +109,12 @@ Resources:
       Subnets: !Ref SubnetIds
       SecurityGroups: !Ref SecurityGroupsIds
       Scheme: internet-facing
-      SslPolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
       LoadBalancerAttributes:
         - Key: idle_timeout.timeout_seconds
           Value: '60'
       Tags:
+        - Key: Name
+          Value: MyApplicationLoadBalancer
         - Key: AppID
           Value: !Ref AppID
         - Key: UserID
@@ -71,6 +130,7 @@ Resources:
       Protocol: HTTPS
       Certificates:
         - CertificateArn: !Ref CertificateArn
+      SslPolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
       DefaultActions:
         - Type: fixed-response
           FixedResponseConfig:
@@ -145,55 +205,3 @@ Outputs:
   LoadBalancerDNSName:
     Description: "DNS name of the load balancer"
     Value: !GetAtt LoadBalancer.DNSName
-
-TASK [Prepare : Run CFN-NAG validation on the main Template for s3 resource type] ***
-
-
-
-changed: [localhost]
-
-TASK [Prepare : fail] **********************************************************
-
-fatal: [localhost]: FAILED! => {
-
-    "changed": false
-
-}
-
-MSG:
-
-{'Message': [{'message': 'Application Load Balancers must have SSL Policy with name ELBSecurityPolicy-TLS-1-2-2017-01', 'type': 'FAIL', 'logical_resource_ids': ['HTTPSListener']}, {'message': 'The tag - Name is mandatory for the resource', 'type': 'FAIL', 'logical_resource_ids': ['LoadBalancer']}], 'Status': 'Fail'}
-
-PLAY RECAP *********************************************************************
-
-localhost                  : ok=18   changed=8    unreachable=0    failed=1    skipped=15   rescued=0    ignored=0   
-
-localhost                  : ok=18   changed=8    unreachable=0    failed=1    skipped=15   rescued=0    ignored=0   
-
-#$$PLAYBOOK EXECUTION COMPLETED$$#
-
-
-
-[Pipeline] }
-
-[Pipeline] // script
-
-[Pipeline] }
-
-[Pipeline] // stage
-
-[Pipeline] }
-
-[Pipeline] // withEnv
-
-[Pipeline] }
-
-[Pipeline] // withEnv
-
-[Pipeline] }
-
-[Pipeline] // node
-
-[Pipeline] End of Pipeline
-
-ERROR: Playbook Execution Failed.
