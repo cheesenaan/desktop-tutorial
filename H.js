@@ -1,41 +1,39 @@
-Uncaught runtime errors:
-×
-ERROR
-Cannot read properties of undefined (reading 'state')
-TypeError: Cannot read properties of undefined (reading 'state')
-    at DisplayResume (http://localhost:3000/static/js/bundle.js:465:25)
-    at renderWithHooks (http://localhost:3000/static/js/bundle.js:56723:22)
-    at mountIndeterminateComponent (http://localhost:3000/static/js/bundle.js:60694:17)
-    at beginWork (http://localhost:3000/static/js/bundle.js:61997:20)
-    at HTMLUnknownElement.callCallback (http://localhost:3000/static/js/bundle.js:46979:18)
-    at Object.invokeGuardedCallbackDev (http://localhost:3000/static/js/bundle.js:47023:20)
-    at invokeGuardedCallback (http://localhost:3000/static/js/bundle.js:47080:35)
-    at beginWork$1 (http://localhost:3000/static/js/bundle.js:66978:11)
-    at performUnitOfWork (http://localhost:3000/static/js/bundle.js:66226:16)
-    at workLoopSync (http://localhost:3000/static/js/bundle.js:66149:9)
-ERROR
-Cannot read properties of undefined (reading 'state')
-TypeError: Cannot read properties of undefined (reading 'state')
-    at DisplayResume (http://localhost:3000/static/js/bundle.js:465:25)
-    at renderWithHooks (http://localhost:3000/static/js/bundle.js:56723:22)
-    at mountIndeterminateComponent (http://localhost:3000/static/js/bundle.js:60694:17)
-    at beginWork (http://localhost:3000/static/js/bundle.js:61997:20)
-    at HTMLUnknownElement.callCallback (http://localhost:3000/static/js/bundle.js:46979:18)
-    at Object.invokeGuardedCallbackDev (http://localhost:3000/static/js/bundle.js:47023:20)
-    at invokeGuardedCallback (http://localhost:3000/static/js/bundle.js:47080:35)
-    at beginWork$1 (http://localhost:3000/static/js/bundle.js:66978:11)
-    at performUnitOfWork (http://localhost:3000/static/js/bundle.js:66226:16)
-    at workLoopSync (http://localhost:3000/static/js/bundle.js:66149:9)
-ERROR
-Cannot read properties of undefined (reading 'state')
-TypeError: Cannot read properties of undefined (reading 'state')
-    at DisplayResume (http://localhost:3000/static/js/bundle.js:465:25)
-    at renderWithHooks (http://localhost:3000/static/js/bundle.js:56723:22)
-    at mountIndeterminateComponent (http://localhost:3000/static/js/bundle.js:60694:17)
-    at beginWork (http://localhost:3000/static/js/bundle.js:61997:20)
-    at beginWork$1 (http://localhost:3000/static/js/bundle.js:66956:18)
-    at performUnitOfWork (http://localhost:3000/static/js/bundle.js:66226:16)
-    at workLoopSync (http://localhost:3000/static/js/bundle.js:66149:9)
-    at renderRootSync (http://localhost:3000/static/js/bundle.js:66122:11)
-    at recoverFromConcurrentError (http://localhost:3000/static/js/bundle.js:65614:24)
-    at performConcurrentWorkOnRoot (http://localhost:3000/static/js/bundle.js:65527:26)
+const DisplayResume = (props) => {
+  // Define state variables using useState
+  const [userId, setUserId] = useState(props.userId);
+  const [resumeData, setResumeData] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Use useEffect to replicate componentDidMount
+  useEffect(() => {
+    const getResumeData = async () => {
+      setIsLoading(true);
+      console.log('isLoading State for getResumeData updated to true');
+
+      try {
+        const pathname = window.location.pathname;
+        const user_id_get = pathname.substring(1);
+        console.log("user_id_get is ", user_id_get);
+
+        // Make the GET request using axios
+        const response = await axios.get('api/v1/resume', {
+          params: { user_id: user_id_get },
+        });
+
+        // Axios automatically parses JSON responses, so you can access data directly
+        setResumeData(response.data);
+        setError(null);
+      } catch (error) {
+        // Handle error
+        console.error('Failed to fetch resume data:', error);
+        setError('Failed to fetch resume data. Please try again later.');
+      } finally {
+        setIsLoading(false);
+        console.log('isLoading State for getResumeData updated to false');
+      }
+    };
+
+    // Call the async function
+    getResumeData();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
