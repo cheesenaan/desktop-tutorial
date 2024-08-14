@@ -1,5 +1,26 @@
+class DisplayResume extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userId: props.userId,
+      resumeData: null,
+      error: null,
+      isLoading:false,
+    };
+  }
 
-try {
+  componentDidMount() {
+    this.getResumeData();
+  }
+
+  getResumeData = async () => {
+
+    this.setState({ isLoading: true }, () => {
+      console.log('isLoading State for getResumeData updated to true successfully:', this.state.isLoading); 
+    });
+
+
+    try {
 
       const pathname = window.location.pathname;
       const user_id_get = pathname.substring(1);
@@ -21,3 +42,15 @@ try {
       console.error('Failed to fetch resume data:', error);
       this.setState({ error: 'Failed to fetch resume data. Please try again later.' });
     }
+
+    this.setState({ isLoading: false }, () => {
+      console.log('isLoading State for getResumeData updated to false successfully:', this.state.isLoading); 
+    });
+
+  };
+
+  render() {
+    const { resumeData, error } = this.state;
+
+    return (
+      <div>
