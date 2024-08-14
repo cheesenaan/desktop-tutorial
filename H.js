@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, RadioButtonGroup, DatePicker, ButtonGroup, Loader } from 'your-component-library'; // Adjust imports based on your component library
+import { Input, RadioButtonGroup, DatePicker, ButtonGroup } from 'your-component-library'; // Adjust imports based on your component library
 import StyledResumeBuild from './StyledResumeBuild'; // Adjust paths as necessary
 import StyledResumeHeader from './StyledResumeHeader';
 import SyledForm from './SyledForm';
@@ -241,7 +241,7 @@ const ResumeSection = ({
               label="Start Date"
               onChange={(date) => handleDateChange('startDate1', date)}
               width="70.7%"
-              value={startDate1}
+              value={startDate1} // Ensure this is in the correct format
               required
             />
           </StyledInput>
@@ -252,7 +252,7 @@ const ResumeSection = ({
               label="End Date"
               onChange={(date) => handleDateChange('endDate1', date)}
               width="70.7%"
-              value={endDate1}
+              value={endDate1} // Ensure this is in the correct format
               required
             />
           </StyledInput>
