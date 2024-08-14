@@ -1,27 +1,98 @@
-getResumeData = async () => {
+saveUserData = async (event) => {
+    console.log(this.state);
+    event.preventDefault();
+
+    
+  
+    const {
+      first_name, last_name, phone, email, location, languages,
+      university, university_location, major, gpa, coursework,
+      company1, jobTitle1, startDate1, endDate1, description1,
+      projectTitle1, projectDescription1, 
+    } = this.state;
+  
+    const requiredFields = [
+      { value: first_name, name: 'First Name' },
+      { value: last_name, name: 'Last Name' },
+      { value: phone, name: 'Phone Number' },
+      { value: email, name: 'Email Address' },
+      { value: location, name: 'Location' },
+      { value: languages, name: 'Languages' },
+      { value: university, name: 'University' },
+      { value: university_location, name: 'University Location' },
+      { value: major, name: 'Major' },
+      { value: gpa, name: 'GPA' },
+      { value: coursework, name: 'Coursework' },
+      { value: company1, name: 'Company Name (Job 1)' },
+      { value: jobTitle1, name: 'Job Title (Job 1)' },
+      { value: startDate1, name: 'Start Date (Job 1)' },
+      { value: endDate1, name: 'End Date (Job 1)' },
+      { value: description1, name: 'Description (Job 1)' },
+      { value: projectTitle1, name: 'Project Title (Project 1)' },
+      { value: projectDescription1, name: 'Project Description (Project 1)' }
+    ];
+  
+    const missingFields = [];
+  
+    requiredFields.forEach(field => {
+      if (field.value === null || field.value === '') {
+        missingFields.push(field.name);
+      }
+    });
+  
+    if (missingFields.length > 0) {
+      const missingFieldsList = missingFields.join(', ');
+      alert(`Please fill in the following required fields: ${missingFieldsList}`);
+      return;
+    }
+
     this.setState({ isLoading: true }, () => {
-      console.log('isLoading State for getResumeData updated to true successfully:', this.state.isLoading); 
+      console.log('isLoading State updated for saveUserData to true successfully:', this.state.isLoading); 
+    });
+  
+    try {
+      const response = await fetch('api/v1/saveUserData', {
+        mode: 'no-cors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          first_name, last_name, phone, email, location, languages,
+          university, university_location, major, gpa, coursework,
+          company1, jobTitle1, startDate1, endDate1, description1,
+          projectTitle1, projectDescription1
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        const { success, message, userId } = data;
+        if (success) {
+          console.log('Success message:', message);
+          console.log('Received userId:', userId);
+          alert(`${message} User ID: ${userId}. Your will be redirected to your resume page`);
+          this.setState({ userId: userId }, () => {
+            console.log('State updated successfully:', this.state.userId); 
+            console.log(this.state);
+            window.location.replace(`https://internal-gts-j6-elast-khxjxldffinw-2045112090.us-east-1.elb.amazonaws.com/${userId}`);
+          });
+        } else {
+          console.log('User Data save failed:', message);
+          alert('User Data save failed!');
+        }
+      } else {
+        alert('Network error or failed to fetch');
+      }
+    } catch (error) {
+      console.error('Error saving user data:', error);
+      alert('Failed to save user data. Please try again later.');
+    }
+
+    this.setState({ isLoading: false }, () => {
+      console.log('isLoading State for saveUserData updated to false successfully:', this.state.isLoading); 
     });
 
-    try {
-      const pathname = window.location.pathname;
-      const user_id_get = pathname.substring(1);
-      console.log("user_id_get is ", user_id_get);
+    console.log(this.state);
 
-      // Make the GET request using axios
-      const response = await axios.get('api/v1/resume', {
-        params: { user_id: user_id_get },
-      });
-
-      // Axios automatically parses JSON responses, so you can access data directly
-      this.setState({ resumeData: response.data, error: null });
-    } catch (error) {
-      // Handle error
-      console.error('Failed to fetch resume data:', error);
-      this.setState({ error: 'Failed to fetch resume data. Please try again later.' });
-    } finally {
-      this.setState({ isLoading: false }, () => {
-        console.log('isLoading State for getResumeData updated to false successfully:', this.state.isLoading); 
-      });
-    }
   };
