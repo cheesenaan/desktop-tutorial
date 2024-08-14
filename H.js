@@ -1,39 +1,3 @@
-import { TitleLockup } from "@vds/type-lockups";
-import { Input } from "@vds/inputs";
-import "@vds/inputs";
-import { RadioButtonGroup } from "@vds/radio-buttons";
-import { DatePicker } from "@vds/date-pickers";
-import { ButtonGroup } from "@vds/buttons";
-import 'styled-components';
-import styled from "styled-components";
-import React, { useState } from 'react';
-import axios from 'axios';
-
-
-const StyledResumeBuild = styled.div`
-  background-color: #f6f6f6;
-  margin-top: 4rem;
-`;
-
-const SyledForm = styled.div`
-  margin-left: 33%;
-`;
-
-const StyledResumeHeader = styled.div`
-  margin-top: 2rem; 
-  margin-bottom: 4rem; 
-`;
-
-const StyledInput = styled.div`
-  margin-top: 1.3rem; // Adjust margin value as needed
-  margin-bottom: 1.3rem; // Adjust margin value as needed
-`;
-
-const StyledResumeButton = styled.div`
-  margin-left: -48%;
-`;
-
-
 const ResumeSection = ({
   first_name,
   last_name,
@@ -76,6 +40,8 @@ const ResumeSection = ({
     projectDescription1
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData(prevData => ({
@@ -91,8 +57,7 @@ const ResumeSection = ({
     }));
   };
 
-  saveUserData = async (event) => {
-    console.log(this.state);
+  const handleSaveUserData = async (event) => {
     event.preventDefault();
 
     const {
@@ -100,7 +65,7 @@ const ResumeSection = ({
       university, university_location, major, gpa, coursework,
       company1, jobTitle1, startDate1, endDate1, description1,
       projectTitle1, projectDescription1,
-    } = this.state;
+    } = formData;
 
     const requiredFields = [
       { value: first_name, name: 'First Name' },
@@ -137,49 +102,25 @@ const ResumeSection = ({
       return;
     }
 
-    this.setState({ isLoading: true }, () => {
-      console.log('isLoading State updated for saveUserData to true successfully:', this.state.isLoading);
-    });
+    setIsLoading(true);
 
     try {
       // Make the POST request using axios
-      const response = await axios.post('api/v1/saveUserData', {
-        first_name, last_name, phone, email, location, languages,
-        university, university_location, major, gpa, coursework,
-        company1, jobTitle1, startDate1, endDate1, description1,
-        projectTitle1, projectDescription1
-      });
+      const response = await axios.post('api/v1/saveUserData', formData);
 
       // Axios automatically parses JSON responses
       const { success, message, userId } = response.data;
 
       if (success) {
-        console.log('Success message:', message);
-        console.log('Received userId:', userId);
         alert(`${message} User ID: ${userId}. You will be redirected to your resume page`);
-        this.setState({ userId: userId }, () => {
-          console.log('State updated successfully:', this.state.userId);
-          console.log(this.state);
-          window.location.replace(`https://internal-gts-j6-elast-khxjxldffinw-2045112090.us-east-1.elb.amazonaws.com/${userId}`);
-        });
+        window.location.replace(`https://internal-gts-j6-elast-khxjxldffinw-2045112090.us-east-1.elb.amazonaws.com/${userId}`);
       } else {
-        console.log('User Data save failed:', message);
         alert('User Data save failed!');
       }
     } catch (error) {
       console.error('Error saving user data:', error);
       alert('Failed to save user data. Please try again later.');
     } finally {
-      this.setState({ isLoading: false }, () => {
-        console.log('isLoading State for saveUserData updated to false successfully:', this.state.isLoading);
-      });
+      setIsLoading(false);
     }
-
-    console.log(this.state);
   };
-
-  return (
-    <StyledResumeBuild>
-      <br />
-
-fix the above code to not have this.state we are using react hooks
