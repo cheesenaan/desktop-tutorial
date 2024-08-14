@@ -1,24 +1,17 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Loader from 'path-to-loader-component'; // Adjust the path as necessary
 
+const DisplayResume = (props) => {
+  // Define state variables using useState
+  const [resumeData, setResumeData] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-class DisplayResume extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      userId: props.userId,
-      resumeData: null,
-      error: null,
-      isLoading:false,
-    };
-  }
-
-  componentDidMount() {
-    this.getResumeData();
-  }
-
-  getResumeData = async () => {
-    this.setState({ isLoading: true }, () => {
-      console.log('isLoading State for getResumeData updated to true successfully:', this.state.isLoading); 
-    });
+  // Function to fetch resume data
+  const getResumeData = async () => {
+    setIsLoading(true);
+    console.log('isLoading State for getResumeData updated to true');
 
     try {
       const pathname = window.location.pathname;
@@ -31,29 +24,40 @@ class DisplayResume extends Component {
       });
 
       // Axios automatically parses JSON responses, so you can access data directly
-      this.setState({ resumeData: response.data, error: null });
+      setResumeData(response.data);
+      setError(null);
     } catch (error) {
       // Handle error
       console.error('Failed to fetch resume data:', error);
-      this.setState({ error: 'Failed to fetch resume data. Please try again later.' });
+      setError('Failed to fetch resume data. Please try again later.');
     } finally {
-      this.setState({ isLoading: false }, () => {
-        console.log('isLoading State for getResumeData updated to false successfully:', this.state.isLoading); 
-      });
+      setIsLoading(false);
+      console.log('isLoading State for getResumeData updated to false');
     }
   };
 
-  render() {
-    const { resumeData, error } = this.state;
+  // Use useEffect to replace componentDidMount
+  useEffect(() => {
+    getResumeData();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
 
-    return (
-      <div>
-
-        <Loader 
-        active={this.state.isLoading}
+  return (
+    <div>
+      <Loader 
+        active={isLoading}
         fullscreen={true}
         surface="light" 
-        />
+      />
 
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        {resumeData && (
+      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {resumeData && (
+        <div>
+          {/* Render resumeData here */}
+          <pre>{JSON.stringify(resumeData, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DisplayResume;
